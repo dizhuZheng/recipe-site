@@ -8,9 +8,9 @@ class UserProfile(AbstractUser):
         ('female', 'Female')
     )
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES)
-    nick_name = models.CharField(max_length=20, verbose_name='昵称', null=True, blank=True)
-    mobile = models.CharField(max_length=11, verbose_name='手机', null=True, blank=True)
-    address = models.CharField(max_length=200, verbose_name='地址', null=True, blank=True)
+    job = models.CharField(max_length=200, verbose_name='Job', null=True, blank=True)
+    email = models.EmailField(max_length=150, verbose_name='Email', null=True, blank=True)
+    address = models.CharField(max_length=200, verbose_name='Address', null=True, blank=True)
 
     class Meta:
         verbose_name = '用户信息'
