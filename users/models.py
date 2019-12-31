@@ -1,17 +1,13 @@
 from django.db import models
-
-# Create your models here.
-# users/models.py
-
-from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
 class UserProfile(AbstractUser):
-    GENDER_CHOICE = (
-        ('male', '男'),
-        ('female', '女')
+    GENDER_CHOICES = (
+        ('male', 'Male'),
+        ('female', 'Female')
     )
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES)
     nick_name = models.CharField(max_length=20, verbose_name='昵称', null=True, blank=True)
     mobile = models.CharField(max_length=11, verbose_name='手机', null=True, blank=True)
     address = models.CharField(max_length=200, verbose_name='地址', null=True, blank=True)
