@@ -14,7 +14,7 @@ class UserProfile(AbstractUser):
     address = models.CharField(max_length=200, verbose_name='Address', null=True, blank=True)
 
     class Meta:
-        verbose_name = '用户信息'
+        verbose_name = 'User Info'
         verbose_name_plural = verbose_name
         ordering = ['-id']
 
