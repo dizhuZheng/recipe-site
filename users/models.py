@@ -7,7 +7,8 @@ class UserProfile(AbstractUser):
         ('male', 'Male'),
         ('female', 'Female')
     )
-    gender = models.CharField(max_length=20, choices=GENDER_CHOICES)
+    username = models.CharField(max_length=200, verbose_name='Username', null=False, blank=False)
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default='Male')
     job = models.CharField(max_length=200, verbose_name='Job', null=True, blank=True)
     email = models.EmailField(max_length=150, verbose_name='Email', null=True, blank=True)
     address = models.CharField(max_length=200, verbose_name='Address', null=True, blank=True)
