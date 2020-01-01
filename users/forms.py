@@ -18,5 +18,5 @@ class SignUpForm(UserCreationForm):
     middle_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
 
     class Meta:
-        model = User
+        model = UserProfile
         fields = ('username', 'first_name', 'last_name', 'middle_name', 'password1', 'password2', )
