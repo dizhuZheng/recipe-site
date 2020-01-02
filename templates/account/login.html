@@ -1,0 +1,13 @@
+<div>
+  <form method='post' action="/accounts/login/" class="form">
+    {% csrf_token %}
+      <button name="submit" class="btn btn-primary">Log in</button>
+    <input type="hidden" name="next" value="/accounts/signup/"  />
+  </form>
+  <br>
+  <p style="margin-left:80px"><strong>-- OR Login With--</strong></p>
+  <div style="margin-left:80px;margin-bottom:10px;">
+    <a href="{% url 'social:begin' 'github' %}">Github</a>
+  </div>
+  <div style="margin-left:80px; padding-top:10px;"><a href="{% url 'account_reset_password' %}">Forgot password ?</a></div>
+</div>
