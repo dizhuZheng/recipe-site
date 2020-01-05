@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
-from .models import UserProfile
+from .models import UserProfile, Image
 from .forms import ProfileForm
 
 
@@ -18,6 +17,7 @@ def change_profile(request):
     '''更新个人资料'''
     if request.method == 'POST':
         # instance参数表示用model实例来初始化表单，这样就可以达到通过表单来更新数据
+        model = Image
         form = ProfileForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()

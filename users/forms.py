@@ -9,4 +9,4 @@ class ProfileForm(forms.ModelForm):
     '''从模型继承表单'''
     class Meta:
         model = UserProfile
-        fields = ['gender', 'job', 'email', 'address']
+        fields = ['photo', 'gender', 'job', 'email', 'address']
