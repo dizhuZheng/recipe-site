@@ -28,7 +28,7 @@
 
 <p>Welcome, {{ user.username }}</p>
 {% if user.photo %}
-    <img src="{{ user.photo.cover.url }}" alt="{{ user.photo.title }}" width="250" height="250">
+    <img src="{{ user.photo.url }}" class="image-preview" width="250" height="250">
 {% else %}
     <img src="{% static "images/default.png" %}" width="250" height="250">
 {% endif %}
