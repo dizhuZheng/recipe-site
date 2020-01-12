@@ -28,7 +28,7 @@
 
 <p>Welcome, {{ user.username }}</p>
 {% if user.photo %}
-    <img src="{{ user.photo.cover.url }}" alt="{{ user.photo.title }}" width="250" height="250">
+    <img src="{{ user.photo.url }}" class="image-preview" width="250" height="250">
 {% else %}
     <img src="{% static "images/default.png" %}" width="250" height="250">
 {% endif %}
@@ -39,6 +39,9 @@
     <li>Email: {{ user.email }}</li>
     <li>Address: {{ user.address }}</li>
     <li>Time Joined: {{ user.date_joined }}</li>
+    <!-- html页面从数据库中读出DateTimeField字段时，显示的时间格式和数据库中存放的格式不一致，比如数据库字段内容为2016-06-03 13:00:00，但是页面显示的却是Apr. 03, 2016, 1 p.m. -->
+<!-- 为了页面和数据库中显示一致，需要在页面格式化时间，需要添加<td>{{ infor.updatetime|date:"Y-m-d H:i:s" }}</td> 类似的过滤器。刷新页面，即可正常显示。 -->
+
 </ul>
 
 </body>
