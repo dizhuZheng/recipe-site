@@ -2,7 +2,6 @@ from django.db import models
 from django.utils import timezone
 from users.models import UserProfile
 from django.urls import reverse
-from django.contrib.auth.decorators import login_required
 # from django.conf import settings
 
 STATUS = (
@@ -18,7 +17,7 @@ class Post(models.Model):
     text = models.TextField()
     slug = models.SlugField(max_length=200)
     created_on = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField(max_length=100, null=True)
+    slug = models.SlugField(max_length=100, null=True, blank=True, unique=True)
     status = models.IntegerField(choices=STATUS, default=0)
 
     class Meta:
@@ -27,8 +26,8 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
-    def get_abosolute_url(self):
-        return reverse('post_detail', kwargs={'slug': str(self.slug)})
+    def get_absolute_url(self):
+        return reverse('post_detail',  kwargs={'slug': self.slug})
 
 
 class Comment(models.Model):
