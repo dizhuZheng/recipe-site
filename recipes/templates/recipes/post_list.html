@@ -1,0 +1,10 @@
+<h1>Posts</h1>
+{% if post_list %}
+<ul>
+  {% for post in post_list %}
+  <li><strong><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></strong>-----({{post.author}})</li>
+</ul>
+{% endfor %}
+{% else %}
+  <p>No topics have been added yet.</p>
+{% endif %}

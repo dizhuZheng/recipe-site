@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
-from .forms import CommentForm
+from .forms import CommentForm, PostForm
 from django.shortcuts import redirect
 from .models import Post, Comment
 from django.views.generic import ListView, DetailView
@@ -26,6 +26,19 @@ def add_comment_to_post(request, pk):
             form = CommentForm()
     return render(request, 'recipes/add_comment_to_post.html', {'form': form})
 
+@login_required
+def post_new(request):
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            Post.author = request.user
+            post.save()
+            return redirect('post_detail', pk=post.pk)
+    else:
+        form = PostForm()
+    return render(request, 'recipes/post_detail.html', {'form': form})
+
 
 @login_required
 def comment_approve(request, pk):
@@ -43,9 +56,10 @@ def comment_remove(request, pk):
 
 class PostListView(ListView):
     model = Post
-    template_name = 'post_list.html'
+    context_object_name = 'post_list'
+    template_name = 'recipes/post_list.html'
 
 
 class PostDetailView(DetailView):
     model = Post
-    template_name = 'post_detail.html'
+    template_name = 'recipes/post_detail.html'
