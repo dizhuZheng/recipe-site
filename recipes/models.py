@@ -10,7 +10,6 @@ STATUS = (
     (1, 'Publish')
 )
 
-# Create your models here.
 class Post(models.Model):
     author = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='recipe_posts')
     title = models.CharField(max_length=150)
@@ -53,4 +52,4 @@ class Comment(models.Model):
 
     def __str__(self):
         # return self.text[:20] + "..."
-        return 'Commented {} by {}'.format(self.text[:20], self.author)
+        return 'Commented {} by {}'.format(self.text[:15], self.author)

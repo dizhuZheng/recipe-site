@@ -1,19 +1,25 @@
 {% load static %}
 <div>
+  <p> {{ post.updated_on }}</p>
   <h2>{{ post.title }}</h2>
-  <p>{{ post.body }}</p>
+  <p>{{ post.text|linebreaksbr }}</p>
 </div>
 <div>
   {% for comment in post.comments.all %}
-  <div>
-    <div>{{ comment.created_time }}</div>
-    {% if comment.author.photo %}
-    <img src="{{ comment.author.photo.url }}" class="image-preview" width="25" height="25">
-    {% else %}
+    {% if user.is_authenticated %}
+    <div>
+      <div>{{ comment.created_time }}</div>
+      {% if comment.author.photo %}
+        <img src="{{ comment.author.photo.url }}" class="image-preview" width="25" height="25">
+      {% else %}
         <img src="{% static "images/default.png" %}" width="25" height="25">
+      {% endif %}
+      <strong>{{ comment.author }}</strong>
+      <p>{{ comment.text|linebreaks }}</p>
+    </div>
     {% endif %}
-    <strong>{{ comment.author }}</strong>
-    <p>{{ comment.text|linebreaks }}</p>
-  </div>
+  {% empty %}
+    <p>No comments here yet :-(</p>
   {% endfor %}
+  <a href="{% url 'recipes:comments' %}">Add comment</a>
 </div>
