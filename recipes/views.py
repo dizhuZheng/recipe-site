@@ -63,10 +63,8 @@ def comment_remove(request, pk):
 class PostListView(ListView):
     model = Post
     context_object_name = 'post_list'
-    ordering = ['-created_on']
     paginate_by = 15
 
 
 class PostDetailView(DetailView):
     model = Post
-    template_name = 'recipes/post_detail.html'

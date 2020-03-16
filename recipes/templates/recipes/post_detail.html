@@ -1,4 +1,19 @@
+{% load static %}
 <div>
   <h2>{{ post.title }}</h2>
   <p>{{ post.body }}</p>
+</div>
+<div>
+  {% for comment in post.comments.all %}
+  <div>
+    <div>{{ comment.created_time }}</div>
+    {% if comment.author.photo %}
+    <img src="{{ comment.author.photo.url }}" class="image-preview" width="25" height="25">
+    {% else %}
+        <img src="{% static "images/default.png" %}" width="25" height="25">
+    {% endif %}
+    <strong>{{ comment.author }}</strong>
+    <p>{{ comment.text|linebreaks }}</p>
+  </div>
+  {% endfor %}
 </div>
