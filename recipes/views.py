@@ -8,7 +8,13 @@ from django.views.generic import ListView, DetailView
 
 class Home(TemplateView):
     template_name = 'home.html'
+    def get_context_data(self, *args, **kwargs):
+        context = super(Home, self).get_context_data(*args, **kwargs)
+        context['name'] = 'BooBooRecipe'
+        return context
 
+class Recipes(TemplateView):
+    template_name = 'recipes/recipes_home.html'
 
 @login_required
 def add_comment_to_post(request, pk):
@@ -57,7 +63,8 @@ def comment_remove(request, pk):
 class PostListView(ListView):
     model = Post
     context_object_name = 'post_list'
-    template_name = 'recipes/post_list.html'
+    ordering = ['-created_on']
+    paginate_by = 15
 
 
 class PostDetailView(DetailView):
