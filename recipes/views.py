@@ -5,7 +5,7 @@ from django.urls import reverse, reverse_lazy
 from .models import Post, Comment
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .forms import CommentForm, PostForm
+from .forms import PostForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
@@ -39,7 +39,7 @@ class CommentListView(ListView):
 class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     template_name = 'recipes/add_comment_to_post.html'
-    form_class = CommentForm
+    fields = ['text']
 
     def form_valid(self, form):
         comment = form.save(commit=False)
