@@ -40,12 +40,13 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     template_name = 'recipes/add_comment_to_post.html'
     form_class = CommentForm
-    success_url = reverse_lazy('posts')
 
     def form_valid(self, form):
         comment = form.save(commit=False)
         form.instance.author = self.request.user
-        return super(CommentCreateView, self).form_valid(form)
+        comment.post_id = '1'
+        comment.save()
+        return redirect('posts:post_detail', slug=comment.post.slug)
 
 
 class CommentUpdate(UpdateView):
