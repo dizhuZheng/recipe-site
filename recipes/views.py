@@ -1,10 +1,13 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404
-from django.shortcuts import redirect
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse, reverse_lazy
 from .models import Post, Comment
-from django.views.generic import ListView, DetailView, CreateView
+from django.http import HttpResponse, HttpResponseRedirect
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .forms import CommentForm, PostForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 class Home(TemplateView):
     template_name = 'home.html'
@@ -33,7 +36,23 @@ class CommentListView(ListView):
     paginate_by = 2
 
 
-class CommentCreateView(CreateView):
+class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     template_name = 'recipes/add_comment_to_post.html'
     form_class = CommentForm
+    success_url = reverse_lazy('posts')
+
+    def form_valid(self, form):
+        comment = form.save(commit=False)
+        form.instance.author = self.request.user
+        return super(CommentCreateView, self).form_valid(form)
+
+
+class CommentUpdate(UpdateView):
+    model = Comment
+    fields = ['text']
+
+
+class CommentDelete(DeleteView):
+    model = Comment
+    success_url = reverse_lazy('posts:post_detail')

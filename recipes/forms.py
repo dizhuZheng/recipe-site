@@ -5,6 +5,7 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['text',]
+        widgets = {"post": forms.HiddenInput()}
 
 
 class PostForm(forms.ModelForm):

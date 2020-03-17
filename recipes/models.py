@@ -41,7 +41,7 @@ class Comment(models.Model):
     author = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     pic = UserProfile.photo
     text = models.TextField()
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments') # recipes.Post
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
 
     def approve(self):
         self.approved_status = True
@@ -49,6 +49,10 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['created_time']
+
+    def get_absolute_url(self):
+        return reverse('posts:post_detail', kwargs={'id': self.post_id})
+
 
     def __str__(self):
         # return self.text[:20] + "..."
