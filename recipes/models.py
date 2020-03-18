@@ -51,7 +51,7 @@ class Comment(models.Model):
         ordering = ['created_time']
 
     def get_absolute_url(self):
-        return reverse('posts:post_detail', kwargs={'id': self.post_id})
+        return reverse('posts:post_detail', kwargs={'id': self.id, 'slug': self.post.slug})
 
 
     def __str__(self):

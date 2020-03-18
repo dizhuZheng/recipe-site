@@ -44,7 +44,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         comment = form.save(commit=False)
         form.instance.author = self.request.user
-        comment.post_id = '1'
+        comment.post_id = Post.objects.get(slug=self.kwargs.get('slug')).id
         comment.save()
         return redirect('posts:post_detail', slug=comment.post.slug)
 
