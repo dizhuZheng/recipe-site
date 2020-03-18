@@ -4,7 +4,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from .models import Post, Comment
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic.edit import DeleteView
 from .forms import PostForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -49,11 +50,21 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
         return redirect('posts:post_detail', slug=comment.post.slug)
 
 
-class CommentUpdate(UpdateView):
+class CommentUpdateView(UpdateView):
     model = Comment
     fields = ['text']
+    pk_url_kwargs = 'id'
+    template_name = 'recipes/add_comment_to_post.html'
+
+    def form_valid(self, form):
+        comment = form.save(commit=False)
+        form.instance.author = self.request.user
+        comment.post_id = Post.objects.get(slug=self.kwargs.get('slug')).id
+        comment.save()
+        return redirect('posts:post_detail', slug=comment.post.slug)
 
 
-class CommentDelete(DeleteView):
+class CommentDeleteView(DeleteView):
     model = Comment
+    template_name = 'recipes/confirm_delete_comment.html'
     success_url = reverse_lazy('posts:post_detail')

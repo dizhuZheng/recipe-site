@@ -15,6 +15,7 @@
       {% endif %}
       <strong>{{ comment.author }}</strong>
       <p>{{ comment.text|linebreaks }}</p>
+      <a href="{% url 'recipes:delete_comment' pk=comment.id %}">Delete comment</a>
     </div>
   {% empty %}
     <p>No comments here yet :-(</p>
