@@ -3,7 +3,6 @@ from django.utils import timezone
 from django.urls import reverse
 from users.models import UserProfile
 from django.template.defaultfilters import slugify
-# from django.conf import settings
 
 STATUS = (
     (0, 'Draft'),
@@ -34,17 +33,13 @@ class Post(models.Model):
             self.slug = slugify(self.title)
         return super().save(*args, **kwargs)
 
+
 class Comment(models.Model):
     created_time = models.DateTimeField(default=timezone.now)
-    approved_status = models.BooleanField(default=False)
     author = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     pic = UserProfile.photo
     text = models.TextField()
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
-
-    def approve(self):
-        self.approved_status = True
-        self.save()
 
     class Meta:
         ordering = ['created_time']
