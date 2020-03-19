@@ -15,7 +15,11 @@
       {% endif %}
       <strong>{{ comment.author }}</strong>
       <p>{{ comment.text|linebreaks }}</p>
-      <a href="{% url 'recipes:delete_comment' pk=comment.id %}">Delete comment</a>
+      {% if user.is_authenticated %}
+        {% if user == comment.author or user == post.author %}
+        <a href="{% url 'recipes:delete_comment' slug=post.slug pk=comment.id %}">Delete comment</a>
+        {% endif %}
+      {% endif %}
     </div>
   {% empty %}
     <p>No comments here yet :-(</p>

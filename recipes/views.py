@@ -67,4 +67,6 @@ class CommentUpdateView(UpdateView):
 class CommentDeleteView(DeleteView):
     model = Comment
     template_name = 'recipes/confirm_delete_comment.html'
-    success_url = reverse_lazy('posts:post_detail')
+
+    def get_success_url(self):
+        return reverse_lazy('posts:post_detail', args=[self.kwargs.get('slug')])
