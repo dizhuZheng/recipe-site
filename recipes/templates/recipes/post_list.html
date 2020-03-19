@@ -1,9 +1,15 @@
 <h1>Posts</h1>
 {% if post_list %}
+<<<<<<< HEAD
 <ul>
   {% for post in post_list %}
   <li><strong><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></strong>-----({{post.author}})</li>
 </ul>
+=======
+  {% for post in post_list %}
+  <li><strong><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></strong>-----({{post.author}})-----Comments:{{ post.comments.count }}
+  </li>
+>>>>>>> master
 {% endfor %}
 {% else %}
   <p>No topics have been added yet.</p>
