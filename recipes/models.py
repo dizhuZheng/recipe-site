@@ -8,12 +8,32 @@ STATUS = (
     (0, 'Draft'),
     (1, 'Publish')
 )
+class Category(models.Model):
+    name = models.CharField(max_length=200)
+    slug = models.SlugField()
+    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE, related_name='children')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'parent'], name='unique_name')
+        ]
+        verbose_name_plural = "categories"
+
+    def __str__(self):
+        full_path = [self.name]
+        k = self.parent
+        while k is not None:
+            full_path.append(k.name)
+            k = k.parent
+        return ' -> '.join(full_path[::-1])
+
 
 class Post(models.Model):
     author = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='recipe_posts')
     title = models.CharField(max_length=150)
     updated_on = models.DateTimeField(auto_now=True)
     text = models.TextField()
+    categories = models.ManyToManyField('Category')
     created_on = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(null=False, unique=True)
     status = models.IntegerField(choices=STATUS, default=0)
