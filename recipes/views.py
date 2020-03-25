@@ -3,11 +3,10 @@ from django.contrib.auth.decorators import login_required
 from .forms import PostForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from .models import Post, Comment
+from .models import Post, Comment, Ingredient
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.views.generic.edit import DeleteView
-from .forms import PostForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
@@ -18,6 +17,7 @@ class Home(TemplateView):
         context['name'] = 'BooBooRecipe'
         return context
 
+
 class Recipes(TemplateView):
     template_name = 'recipes/recipes_home.html'
 
@@ -26,6 +26,7 @@ class PostListView(ListView):
     model = Post
     context_object_name = 'post_list'
     paginate_by = 15
+
 
 class PostDetailView(DetailView):
     model = Post
@@ -50,6 +51,13 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
         comment.post_id = Post.objects.get(slug=self.kwargs.get('slug')).id
         comment.save()
         return redirect('posts:post_detail', slug=comment.post.slug)
+
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    login_url = reverse_lazy('account_login')
+    model = Post
+    template_name = 'recipes/create_recipe.html'
+    form_class = PostForm
 
 
 class CommentDeleteView(DeleteView):
