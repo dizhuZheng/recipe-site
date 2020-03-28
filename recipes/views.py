@@ -1,6 +1,5 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
-from .forms import PostForm, IngredientForm, IngredientFormSet
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from .models import Post, Comment, Ingredient
@@ -8,8 +7,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.views.generic.edit import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.db import transaction
-from django.forms import formset_factory
+from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory, SuccessMessageMixin, FormSetView
+
+
 
 class Home(TemplateView):
     template_name = 'home.html'
@@ -54,33 +54,25 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
         return redirect('posts:post_detail', slug=comment.post.slug)
 
 
-class PostCreateView(LoginRequiredMixin, CreateView):
-    login_url = reverse_lazy('account_login')
+class IngredientInline(InlineFormSetFactory):
     model = Ingredient
+    fields = ['name', 'amount', 'unit']
+    factory_kwargs = {'extra': 2, 'max_num': None, 'min_num':1, 'can_order': False, 'can_delete': False}
+
+
+class CreateOrderView(LoginRequiredMixin, CreateWithInlinesView):
+    login_url = reverse_lazy('account_login')
+    model = Post
+    inlines = [IngredientInline]
+    fields = ['title', 'text', 'categories', 'cook_time']
     template_name = 'recipes/create_recipe.html'
-    form_class = IngredientForm
+    success_url = 'posts_list'
 
-    def get_context_data(self, **kwargs):
-        context = super(PostCreateView, self).get_context_data(**kwargs)
-        context['formset'] = IngredientFormSet(queryset=Ingredient.objects.none())
-        context['post_form'] = PostForm()
-        return context
-
-    def post(self, request, *args, **kwargs):
-        formset = IngredientFormSet(request.POST)
-        post_form = PostForm(data=request.POST)
-        if formset.is_valid() and post_form.is_valid():
-            return self.form_valid(formset, post_form)
-
-
-    def form_valid(self, formset, post_form):
-        recipe = post_form
-        instances = formset.save(commit=False)
-        formset.instance.author = self.request.user
-        for instance in instances:
-            instance.post = recipe
-            instance.save()
-        return redirect('posts')
+    def form_valid(self, form):
+        p = form.save(commit=False)
+        form.instance.author = self.request.user
+        p.save()
+        return redirect('posts:posts_list')
 
 
 class CommentDeleteView(DeleteView):
