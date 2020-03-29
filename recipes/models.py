@@ -93,7 +93,7 @@ class Post(BaseModel):
 class Comment(BaseModel):
     author = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='comment_author')
     text = models.TextField()
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_comments')
 
     class Meta:
         ordering = ['created_on']

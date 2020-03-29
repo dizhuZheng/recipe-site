@@ -10,7 +10,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory, SuccessMessageMixin, FormSetView
 
 
-
 class Home(TemplateView):
     template_name = 'home.html'
     def get_context_data(self, *args, **kwargs):
@@ -32,17 +31,14 @@ class PostListView(ListView):
 class PostDetailView(DetailView):
     model = Post
     template_name = 'recipes/post_detail.html'
+    context_object_name = 'post'
 
     def get_context_data(self, **kwargs):
         context = super(PostDetailView, self).get_context_data(**kwargs)
         context['ingredients'] = self.object.post_ingredients.all()
+        context['steps'] = self.object.post_steps.all()
+        context['comments'] = self.object.post_comments.all()
         return context
-
-
-class CommentListView(ListView):
-    model = Comment
-    template_name = 'recipes/post_detail.html'
-    paginate_by = 2
 
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
