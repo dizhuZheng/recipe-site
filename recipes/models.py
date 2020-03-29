@@ -5,7 +5,6 @@ from users.models import UserProfile
 from django.template.defaultfilters import slugify
 
 
-
 class BaseModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, verbose_name='Created Time')
     updated_on = models.DateTimeField(auto_now=True, verbose_name='Updated Time')
@@ -37,7 +36,6 @@ class Category(models.Model):
 class Post(BaseModel):
     author = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='post_author')
     title = models.CharField(max_length=150)
-    text = models.TextField()
     slug = models.SlugField(null=False, unique=True)
     CAT_CHOICE = [
         ('Basic', (
@@ -129,7 +127,19 @@ class Ingredient(models.Model):
     unit = models.CharField(max_length=5, choices=UNIT_CHOICE, default='')
 
     def __str__(self):
-        return (self.name, self.amount, self.post.id)
+        return (('name:%s, amount:%d, post_id:%d')%(self.name, self.amount, self.post.id))
 
     class Meta:
         verbose_name_plural = 'ingredients'
+
+
+class Step(models.Model):
+    text = models.CharField(max_length=300, help_text='description')
+    pic = models.ImageField(upload_to='images/', null=True, blank=True, width_field=100, height_field=100)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_steps')
+
+    def __str__(self):
+        return (self.text[:15], self.post.slug)
+
+    class Meta:
+        verbose_name_plural = 'steps'

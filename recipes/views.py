@@ -2,7 +2,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from .models import Post, Comment, Ingredient
+from .models import Post, Comment, Ingredient, Step
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.views.generic.edit import DeleteView
@@ -33,6 +33,11 @@ class PostDetailView(DetailView):
     model = Post
     template_name = 'recipes/post_detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(PostDetailView, self).get_context_data(**kwargs)
+        context['ingredients'] = self.object.post_ingredients.all()
+        return context
+
 
 class CommentListView(ListView):
     model = Comment
@@ -46,7 +51,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     template_name = 'recipes/add_comment_to_post.html'
     fields = ['text']
 
-    def form_valid(self, form):
+    def form_valid(self,form):
         comment = form.save(commit=False)
         form.instance.author = self.request.user
         comment.post_id = Post.objects.get(slug=self.kwargs.get('slug')).id
@@ -58,13 +63,19 @@ class IngredientInline(InlineFormSetFactory):
     model = Ingredient
     fields = ['name', 'amount', 'unit']
     factory_kwargs = {'extra': 2, 'max_num': None, 'min_num':1, 'can_order': False, 'can_delete': False}
+    formset_kwargs = {'auto_id': 'my_id_%s'}
 
+class StepInline(InlineFormSetFactory):
+    model = Step
+    fields = ['text', 'pic']
+    factory_kwargs = {'extra': 2, 'max_num': None, 'min_num':1, 'can_order': False, 'can_delete': False}
+    formset_kwargs = {'auto_id': 'my_id_%s'}
 
-class CreateOrderView(LoginRequiredMixin, CreateWithInlinesView):
+class CreateRecipeView(LoginRequiredMixin, CreateWithInlinesView):
     login_url = reverse_lazy('account_login')
     model = Post
-    inlines = [IngredientInline]
-    fields = ['title', 'text', 'categories', 'cook_time']
+    inlines = [IngredientInline, StepInline]
+    fields = ['title', 'categories', 'cook_time']
     template_name = 'recipes/create_recipe.html'
     success_url = 'posts_list'
 
@@ -81,3 +92,8 @@ class CommentDeleteView(DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('posts:post_detail', args=[self.kwargs.get('slug')])
+
+'''
+class PostEditView(LoginRequiredMixin, EditView)
+def get_object()
+'''
