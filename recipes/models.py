@@ -3,6 +3,8 @@ from django.utils import timezone
 from django.urls import reverse
 from users.models import UserProfile
 from django.template.defaultfilters import slugify
+# from django.core.exceptions import ValidationError
+from  django.core.validators import MinValueValidator
 
 
 class BaseModel(models.Model):
@@ -38,34 +40,34 @@ class Post(BaseModel):
     title = models.CharField(max_length=150)
     slug = models.SlugField(null=False, unique=True)
     CAT_CHOICE = [
-        ('Basic', (
-            (21, 'breakfast'),
-            (22, 'lunch'),
-            (23, 'supper'),
-            (24, 'snack'),
-            (25, 'beverages'),
-            (26, 'dessert')
-        )),
-        ('Flavors', (
+        ('Flavors',(
             (11, 'spicy'),
             (12, 'sour'),
             (13, 'sweet'),
             (14, 'bitter'),
             (15, 'plain')
         )),
-        ('Style', (
-            (31, 'foreign food'),
-            (32, 'home cooking'),
-            (33, 'local characteristics'),
-        )),
-        ('People', (
-            (41, 'Baby'),
-            (42, 'Teenager'),
-            (43, 'Old people'),
-            (44, 'All')
-        )),
-        ('unknown', 'Unknown'),
-    ]
+            ('Basic', (
+                (21, 'breakfast'),
+                (22, 'lunch'),
+                (23, 'supper'),
+                (24, 'snack'),
+                (25, 'beverages'),
+                (26, 'dessert')
+            )),
+            ('Style', (
+                (31, 'foreign food'),
+                (32, 'home cooking'),
+                (33, 'local characteristics'),
+            )),
+            ('People', (
+                (41, 'Baby'),
+                (42, 'Teenager'),
+                (43, 'Old people'),
+                (44, 'All')
+            )),
+            ('unknown', 'Unknown'),
+        ]
     categories = models.ManyToManyField('Category', choices=CAT_CHOICE, default='unknown')
     STATUS = [
         (0, 'Draft'),
@@ -110,9 +112,8 @@ class Comment(BaseModel):
 class Ingredient(models.Model):
     name = models.CharField(max_length=100, help_text='Ingredient name')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_ingredients')
-    amount = models.FloatField(default=1)
+    amount = models.DecimalField(max_digits=5, decimal_places=2, help_text="eg: 2g", validators=[MinValueValidator(0.01, message='must be greater than 0.01!')])
     UNIT_CHOICE = [
-        ('', ''),
         ('g', 'gram'),
         ('mg', 'milligram'),
         ('kg', 'kilogram'),
@@ -124,7 +125,7 @@ class Ingredient(models.Model):
         ('tea', 'teaspoon'),
         ('p', 'pound')
     ]
-    unit = models.CharField(max_length=5, choices=UNIT_CHOICE, default='')
+    unit = models.CharField(max_length=5, choices=UNIT_CHOICE, null=True, blank=True)
 
     def __str__(self):
         return (('name:%s, amount:%d, post_id:%d')%(self.name, self.amount, self.post.id))

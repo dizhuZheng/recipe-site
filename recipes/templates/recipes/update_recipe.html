@@ -1,0 +1,10 @@
+<form method="post">
+  {% csrf_token %}
+  {{ form }}
+  <table>
+    {% for formset in inlines %}
+    {{ formset }}
+    {% endfor %}
+  </table>
+  <input type="submit" value="Update" class="submit" />
+</form>

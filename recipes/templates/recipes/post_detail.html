@@ -9,6 +9,14 @@
     <span>{{ i.unit }}</span>
     {% endfor %}
   </div>
+  <div>
+    {% for s in steps %}
+    <p>{{ s.text }}</p>
+    {% endfor %}
+  </div>
+  {% if post.author.is_authenticated %}
+  <a href="{% url 'recipes:update_post' slug=post.slug %}">Edit Post</a>
+  {% endif %}
 </div>
 <div>
   {% for comment in comments.all %}

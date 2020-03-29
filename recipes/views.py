@@ -61,11 +61,13 @@ class IngredientInline(InlineFormSetFactory):
     factory_kwargs = {'extra': 2, 'max_num': None, 'min_num':1, 'can_order': False, 'can_delete': False}
     formset_kwargs = {'auto_id': 'my_id_%s'}
 
+
 class StepInline(InlineFormSetFactory):
     model = Step
     fields = ['text', 'pic']
     factory_kwargs = {'extra': 2, 'max_num': None, 'min_num':1, 'can_order': False, 'can_delete': False}
     formset_kwargs = {'auto_id': 'my_id_%s'}
+
 
 class CreateRecipeView(LoginRequiredMixin, CreateWithInlinesView):
     login_url = reverse_lazy('account_login')
@@ -89,7 +91,12 @@ class CommentDeleteView(DeleteView):
     def get_success_url(self):
         return reverse_lazy('posts:post_detail', args=[self.kwargs.get('slug')])
 
-'''
-class PostEditView(LoginRequiredMixin, EditView)
-def get_object()
-'''
+
+class PostEditView(UpdateWithInlinesView):
+    model = Post
+    inlines = [IngredientInline, StepInline]
+    fields = ['title', 'categories', 'cook_time']
+    template_name = 'recipes/update_recipe.html'
+
+    def get_success_url(self):
+        return reverse_lazy('posts:post_detail', args=[self.kwargs.get('slug')])
