@@ -8,6 +8,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.views.generic.edit import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory, SuccessMessageMixin, FormSetView
+from django.contrib import messages
 
 
 class Home(TemplateView):
@@ -69,12 +70,13 @@ class StepInline(InlineFormSetFactory):
     formset_kwargs = {'auto_id': 'my_id_%s'}
 
 
-class CreateRecipeView(LoginRequiredMixin, CreateWithInlinesView):
+class CreateRecipeView(LoginRequiredMixin, SuccessMessageMixin, CreateWithInlinesView):
     login_url = reverse_lazy('account_login')
     model = Post
     inlines = [IngredientInline, StepInline]
     fields = ['title', 'categories', 'cook_time']
     template_name = 'recipes/create_recipe.html'
+    success_message = 'Recipe %(title)s was created successfully'
     success_url = 'posts_list'
 
     def form_valid(self, form):
@@ -90,6 +92,18 @@ class CommentDeleteView(DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('posts:post_detail', args=[self.kwargs.get('slug')])
+
+
+class PostDeleteView(SuccessMessageMixin, DeleteView):
+    model = Post
+    template_name = 'recipes/confirm_delete_post.html'
+    success_url = 'posts:post_list'
+    success_message = 'Recipe %(title)s was deleted successfully'
+
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        messages.success(self.request, self.success_message % obj.__dict__)
+        return super(PostDeleteView, self).delete(request, *args, **kwargs)
 
 
 class PostEditView(UpdateWithInlinesView):
