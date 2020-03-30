@@ -76,7 +76,6 @@ class CreateRecipeView(LoginRequiredMixin, SuccessMessageMixin, CreateWithInline
     inlines = [IngredientInline, StepInline]
     fields = ['title', 'categories', 'cook_time']
     template_name = 'recipes/create_recipe.html'
-    success_message = 'Recipe %(title)s was created successfully'
     success_url = 'posts_list'
 
     def form_valid(self, form):
@@ -94,16 +93,12 @@ class CommentDeleteView(DeleteView):
         return reverse_lazy('posts:post_detail', args=[self.kwargs.get('slug')])
 
 
-class PostDeleteView(SuccessMessageMixin, DeleteView):
+class PostDeleteView(DeleteView):
     model = Post
     template_name = 'recipes/confirm_delete_post.html'
-    success_url = 'posts:post_list'
-    success_message = 'Recipe %(title)s was deleted successfully'
 
-    def delete(self, request, *args, **kwargs):
-        obj = self.get_object()
-        messages.success(self.request, self.success_message % obj.__dict__)
-        return super(PostDeleteView, self).delete(request, *args, **kwargs)
+    def get_success_url(self):
+        return reverse_lazy('posts:posts_list')
 
 
 class PostEditView(UpdateWithInlinesView):

@@ -16,6 +16,7 @@
   </div>
   {% if post.author.is_authenticated %}
   <a href="{% url 'recipes:update_post' slug=post.slug %}">Edit Post</a>
+  <a href="{% url 'recipes:delete_post' slug=post.slug %}">Delete Post</a>
   {% endif %}
 </div>
 <div>
