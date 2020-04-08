@@ -5,6 +5,7 @@ from .models import Post, Comment, Category, Step, Ingredient
 admin.site.register(Comment)
 
 class PostAdmin(admin.ModelAdmin):
+    exclude = ('slug',)
     list_display = ('title', 'slug', 'status', 'created_on')
 
 

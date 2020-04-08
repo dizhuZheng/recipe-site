@@ -5,6 +5,7 @@ from users.models import UserProfile
 from django.template.defaultfilters import slugify
 # from django.core.exceptions import ValidationError
 from  django.core.validators import MinValueValidator
+from .unique_slug import unique_slugify
 
 
 class BaseModel(models.Model):
@@ -38,35 +39,35 @@ class Category(models.Model):
 class Post(BaseModel):
     author = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='post_author')
     title = models.CharField(max_length=150)
-    slug = models.SlugField(null=False, unique=True)
+    slug = models.SlugField(unique=True, max_length=100)
     CAT_CHOICE = [
-        ('Flavors',(
+        ('Flavors', (
             (11, 'spicy'),
             (12, 'sour'),
             (13, 'sweet'),
             (14, 'bitter'),
             (15, 'plain')
         )),
-            ('Basic', (
-                (21, 'breakfast'),
-                (22, 'lunch'),
-                (23, 'supper'),
-                (24, 'snack'),
-                (25, 'beverages'),
-                (26, 'dessert')
-            )),
-            ('Style', (
-                (31, 'foreign food'),
-                (32, 'home cooking'),
-                (33, 'local characteristics'),
-            )),
-            ('People', (
-                (41, 'Baby'),
-                (42, 'Teenager'),
-                (43, 'Old people'),
-                (44, 'All')
-            )),
-            ('unknown', 'Unknown'),
+        ('Basic', (
+            (21, 'breakfast'),
+            (22, 'lunch'),
+            (23, 'supper'),
+            (24, 'snack'),
+            (25, 'beverages'),
+            (26, 'dessert')
+        )),
+        ('Style', (
+            (31, 'foreign food'),
+            (32, 'home cooking'),
+            (33, 'local characteristics'),
+        )),
+        ('People', (
+            (41, 'Baby'),
+            (42, 'Teenager'),
+            (43, 'Old people'),
+            (44, 'All')
+        )),
+        ('unknown', 'Unknown'),
         ]
     categories = models.ManyToManyField('Category', choices=CAT_CHOICE, default='unknown')
     STATUS = [
@@ -86,10 +87,10 @@ class Post(BaseModel):
         """returns the url to access a particular recipe access"""
         return reverse('posts:post_detail', kwargs={'slug': self.slug})
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        return super().save(*args, **kwargs)
+    def save(self, **kwargs):
+        slug = "%s %s" % (self.author, self.title)
+        unique_slugify(self, slug)
+        return super(Post, self).save()
 
 
 class Comment(BaseModel):

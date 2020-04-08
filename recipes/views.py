@@ -1,4 +1,5 @@
 from django.views.generic import TemplateView
+from django import forms
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -7,8 +8,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.views.generic.edit import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory, SuccessMessageMixin, FormSetView
-from django.contrib import messages
+from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory, FormSetView
+from .fields import GroupedModelChoiceField
+from .models import Category
 
 
 class Home(TemplateView):
@@ -26,6 +28,7 @@ class Recipes(TemplateView):
 class PostListView(ListView):
     model = Post
     context_object_name = 'post_list'
+    template_name = 'recipes/post_list.html'
     paginate_by = 15
 
 
@@ -70,21 +73,6 @@ class StepInline(InlineFormSetFactory):
     formset_kwargs = {'auto_id': 'my_id_%s'}
 
 
-class CreateRecipeView(LoginRequiredMixin, SuccessMessageMixin, CreateWithInlinesView):
-    login_url = reverse_lazy('account_login')
-    model = Post
-    inlines = [IngredientInline, StepInline]
-    fields = ['title', 'categories', 'cook_time']
-    template_name = 'recipes/create_recipe.html'
-    success_url = 'posts_list'
-
-    def form_valid(self, form):
-        p = form.save(commit=False)
-        form.instance.author = self.request.user
-        p.save()
-        return redirect('posts:posts_list')
-
-
 class CommentDeleteView(DeleteView):
     model = Comment
     template_name = 'recipes/confirm_delete_comment.html'
@@ -109,3 +97,29 @@ class PostEditView(UpdateWithInlinesView):
 
     def get_success_url(self):
         return reverse_lazy('posts:post_detail', args=[self.kwargs.get('slug')])
+
+
+class RecipeForm(forms.ModelForm):
+    category = GroupedModelChoiceField(
+        queryset=Category.objects.exclude(parent=None),
+        choices_groupby='parent'
+    )
+
+    class Meta:
+        model = Post
+        fields = ('title', 'cook_time', 'category')
+
+
+class CreateRecipeView(LoginRequiredMixin, CreateWithInlinesView):
+    login_url = reverse_lazy('account_login')
+    model = Post
+    inlines = [IngredientInline, StepInline]
+    form_class = RecipeForm
+    template_name = 'recipes/create_recipe.html'
+    success_url = 'posts_list'
+
+    def form_valid(self, form):
+        p = form.save(commit=False)
+        form.instance.author = self.request.user
+        p.save()
+        return redirect('posts:posts_list')

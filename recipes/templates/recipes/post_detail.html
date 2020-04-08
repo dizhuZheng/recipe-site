@@ -21,7 +21,7 @@
 </div>
 <div>
   {% for comment in comments.all %}
-    <div>{{ comment.created_time }}</div>
+    <div>{{ comment.created_on }}</div>
     {% if comment.author.photo %}
       <img src="{{ comment.author.photo.url }}" class="image-preview" width="25" height="25">
     {% else %}
