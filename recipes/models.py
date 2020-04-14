@@ -75,7 +75,13 @@ class Post(BaseModel):
         (1, 'Publish')
     ]
     status = models.IntegerField(choices=STATUS, default=0)
-    cook_time = models.IntegerField(null=True, blank=True)
+    cook_time = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1, message='must be greater than 1!')])
+    UNIT_CHOICE = [
+        ('s', 'seconds'),
+        ('m', 'minutes'),
+        ('h', 'hours')
+    ]
+    unit = models.CharField(max_length=5, choices=UNIT_CHOICE, null=True, blank=True, default='m')
 
     class Meta:
         ordering = ["-created_on"]

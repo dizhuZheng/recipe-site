@@ -51,7 +51,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     template_name = 'recipes/add_comment_to_post.html'
     fields = ['text']
 
-    def form_valid(self,form):
+    def form_valid(self, form):
         comment = form.save(commit=False)
         form.instance.author = self.request.user
         comment.post_id = Post.objects.get(slug=self.kwargs.get('slug')).id
@@ -62,14 +62,16 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 class IngredientInline(InlineFormSetFactory):
     model = Ingredient
     fields = ['name', 'amount', 'unit']
-    factory_kwargs = {'extra': 2, 'max_num': None, 'min_num':1, 'can_order': False, 'can_delete': False}
+    prefix = 'Ingredients'
+    factory_kwargs = {'extra': 2, 'max_num': 250, 'min_num':1, 'can_order': False, 'can_delete': True}
     formset_kwargs = {'auto_id': 'my_id_%s'}
 
 
 class StepInline(InlineFormSetFactory):
     model = Step
     fields = ['text', 'pic']
-    factory_kwargs = {'extra': 2, 'max_num': None, 'min_num':1, 'can_order': False, 'can_delete': False}
+    prefix = 'Steps'
+    factory_kwargs = {'extra': 2, 'max_num': 250, 'min_num':1, 'can_order': True, 'can_delete': True}
     formset_kwargs = {'auto_id': 'my_id_%s'}
 
 
@@ -99,22 +101,12 @@ class PostEditView(UpdateWithInlinesView):
         return reverse_lazy('posts:post_detail', args=[self.kwargs.get('slug')])
 
 
-class RecipeForm(forms.ModelForm):
-    category = GroupedModelChoiceField(
-        queryset=Category.objects.exclude(parent=None),
-        choices_groupby='parent'
-    )
-
-    class Meta:
-        model = Post
-        fields = ('title', 'cook_time', 'category')
-
 
 class CreateRecipeView(LoginRequiredMixin, CreateWithInlinesView):
     login_url = reverse_lazy('account_login')
     model = Post
     inlines = [IngredientInline, StepInline]
-    form_class = RecipeForm
+    fields = ['title', 'cook_time', 'unit', 'categories']
     template_name = 'recipes/create_recipe.html'
     success_url = 'posts_list'
 
