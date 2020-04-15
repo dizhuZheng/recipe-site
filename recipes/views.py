@@ -1,4 +1,3 @@
-from django.views.generic import TemplateView
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
@@ -11,18 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory, FormSetView
 from .fields import GroupedModelChoiceField
 from .models import Category
-
-
-class Home(TemplateView):
-    template_name = 'home.html'
-    def get_context_data(self, *args, **kwargs):
-        context = super(Home, self).get_context_data(*args, **kwargs)
-        context['name'] = 'BooBooRecipe'
-        return context
-
-
-class Recipes(TemplateView):
-    template_name = 'recipes/recipes_home.html'
+from django.forms.widgets import HiddenInput
 
 
 class PostListView(ListView):
@@ -63,16 +51,17 @@ class IngredientInline(InlineFormSetFactory):
     model = Ingredient
     fields = ['name', 'amount', 'unit']
     prefix = 'Ingredients'
-    factory_kwargs = {'extra': 2, 'max_num': 250, 'min_num':1, 'can_order': False, 'can_delete': True}
-    formset_kwargs = {'auto_id': 'my_id_%s'}
+    factory_kwargs = {'extra': 2, 'max_num': 250, 'min_num':1, 'can_order': False, 'can_delete': False}
 
 
 class StepInline(InlineFormSetFactory):
     model = Step
     fields = ['text', 'pic']
     prefix = 'Steps'
-    factory_kwargs = {'extra': 2, 'max_num': 250, 'min_num':1, 'can_order': True, 'can_delete': True}
-    formset_kwargs = {'auto_id': 'my_id_%s'}
+    factory_kwargs = {'extra': 0, 'max_num': 250, 'min_num':1, 'can_order': False, 'can_delete': False}
+
+    def get_ordering_widget(self):
+        return HiddenInput(attrs={'class': 'ordering'})
 
 
 class CommentDeleteView(DeleteView):
@@ -94,8 +83,8 @@ class PostDeleteView(DeleteView):
 class PostEditView(UpdateWithInlinesView):
     model = Post
     inlines = [IngredientInline, StepInline]
-    fields = ['title', 'categories', 'cook_time']
-    template_name = 'recipes/update_recipe.html'
+    fields = ['title', 'categories', 'unit', 'cook_time']
+    template_name = 'recipes/create_recipe.html'
 
     def get_success_url(self):
         return reverse_lazy('posts:post_detail', args=[self.kwargs.get('slug')])

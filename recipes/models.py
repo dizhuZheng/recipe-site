@@ -3,10 +3,11 @@ from django.utils import timezone
 from django.urls import reverse
 from users.models import UserProfile
 from django.template.defaultfilters import slugify
-# from django.core.exceptions import ValidationError
+import uuid
 from  django.core.validators import MinValueValidator
 from .unique_slug import unique_slugify
 
+unique_id = uuid.uuid4().hex
 
 class BaseModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, verbose_name='Created Time')
@@ -105,7 +106,7 @@ class Comment(BaseModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_comments')
 
     class Meta:
-        ordering = ['created_on']
+        ordering = ['-created_on']
 
     def get_absolute_url(self):
         return reverse('posts:post_detail', kwargs={'id': self.id, 'slug': self.post.slug})
@@ -117,9 +118,9 @@ class Comment(BaseModel):
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=100, help_text='Ingredient name')
+    name = models.CharField(max_length=100)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_ingredients')
-    amount = models.DecimalField(max_digits=5, decimal_places=2, help_text="eg: 2g", validators=[MinValueValidator(0.01, message='must be greater than 0.01!')])
+    amount = models.DecimalField(max_digits=5, decimal_places=1, help_text="eg: 2g", validators=[MinValueValidator(0.01, message='must be greater than 0.01!')])
     UNIT_CHOICE = [
         ('g', 'gram'),
         ('mg', 'milligram'),
@@ -142,7 +143,7 @@ class Ingredient(models.Model):
 
 
 class Step(models.Model):
-    text = models.CharField(max_length=300, help_text='description')
+    text = models.TextField(max_length=300, null=False, blank=False)
     pic = models.ImageField(upload_to='images/', null=True, blank=True, width_field=100, height_field=100)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_steps')
 

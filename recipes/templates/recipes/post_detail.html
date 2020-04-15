@@ -4,15 +4,18 @@
   <h2>{{ post.title }}</h2>
   <div>
     {% for i in ingredients %}
-    <p>{{ i.name }}</p>
-    <span>{{ i.amount}}</span>
-    <span>{{ i.unit }}</span>
+      <b>{{ i.name }}{{ i.amount}}</b>
+      {% if i.unit %}
+        {{ i.unit }}
+      {% endif %}
     {% endfor %}
   </div>
   <div>
-    {% for s in steps %}
-    <p>{{ s.text }}</p>
-    {% endfor %}
+    <ul>
+      {% for step in steps %}
+        <li>{{ step.text }}</li>
+      {% endfor %}
+    </ul>
   </div>
   {% if post.author.is_authenticated %}
   <a href="{% url 'recipes:update_post' slug=post.slug %}">Edit Post</a>
