@@ -3,6 +3,7 @@
   <p> {{ post.updated_on }}</p>
   <h2>{{ post.title }}</h2>
   <div>
+    {{ ingredients.count }}
     {% for i in ingredients %}
       <b>{{ i.name }}{{ i.amount}}</b>
       {% if i.unit %}
@@ -12,6 +13,7 @@
   </div>
   <div>
     <ul>
+      {{ steps.count }}
       {% for step in steps %}
         <li>{{ step.text }}</li>
       {% endfor %}

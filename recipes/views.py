@@ -49,19 +49,20 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
 class IngredientInline(InlineFormSetFactory):
     model = Ingredient
-    fields = ['name', 'amount', 'unit']
     prefix = 'Ingredients'
-    factory_kwargs = {'extra': 2, 'max_num': 250, 'min_num':1, 'can_order': False, 'can_delete': False}
+    fields = ['name', 'amount', 'unit']
+    factory_kwargs = { 'extra': 1, 'max_num': None, 'min_num':2, 'can_order': False, 'can_delete': False}
+
+
+class UpdateIngredient(IngredientInline):
+    factory_kwargs = { 'extra': 1, 'min_num':1, 'can_order': False, 'can_delete': False}
 
 
 class StepInline(InlineFormSetFactory):
     model = Step
     fields = ['text', 'pic']
     prefix = 'Steps'
-    factory_kwargs = {'extra': 0, 'max_num': 250, 'min_num':1, 'can_order': False, 'can_delete': False}
-
-    def get_ordering_widget(self):
-        return HiddenInput(attrs={'class': 'ordering'})
+    factory_kwargs = {'extra':1, 'max_num': 250, 'min_num':1, 'can_order': False, 'can_delete': False}
 
 
 class CommentDeleteView(DeleteView):
@@ -82,13 +83,12 @@ class PostDeleteView(DeleteView):
 
 class PostEditView(UpdateWithInlinesView):
     model = Post
-    inlines = [IngredientInline, StepInline]
+    inlines = [UpdateIngredient, StepInline]
     fields = ['title', 'categories', 'unit', 'cook_time']
     template_name = 'recipes/create_recipe.html'
 
     def get_success_url(self):
         return reverse_lazy('posts:post_detail', args=[self.kwargs.get('slug')])
-
 
 
 class CreateRecipeView(LoginRequiredMixin, CreateWithInlinesView):

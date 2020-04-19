@@ -148,7 +148,7 @@ class Step(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_steps')
 
     def __str__(self):
-        return (self.text[:15], self.post.slug)
+        return 'first step {} from {}'.format(self.text[:15], self.post.slug)
 
     class Meta:
         verbose_name_plural = 'steps'
