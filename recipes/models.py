@@ -152,3 +152,8 @@ class Step(models.Model):
 
     class Meta:
         verbose_name_plural = 'steps'
+
+
+class Image(models.Model):
+    name = models.CharField(max_length=50)
+    image = models.ImageField(upload_to='images/', null=True, blank=True)

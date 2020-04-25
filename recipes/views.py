@@ -1,16 +1,16 @@
 from django import forms
+from django.forms import formset_factory, modelformset_factory
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
-from .models import Post, Comment, Ingredient, Step
+from .models import Post, Comment, Ingredient, Step, Image
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.views.generic.edit import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory, FormSetView
+from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory
 from .fields import GroupedModelChoiceField
-from .models import Category
-from django.forms.widgets import HiddenInput
+from django.contrib import messages
 
 
 class PostListView(ListView):
@@ -58,11 +58,27 @@ class UpdateIngredient(IngredientInline):
     factory_kwargs = { 'extra': 1, 'min_num':1, 'can_order': False, 'can_delete': False}
 
 
+class StepForm(forms.ModelForm):
+    class Meta:
+        model = Step
+        fields = ('text', 'pic')
+
+class ImageForm(forms.ModelForm):
+    class Meta:
+        model = Image
+        fields = ['name', 'image']
+
+
 class StepInline(InlineFormSetFactory):
     model = Step
-    fields = ['text', 'pic']
+    form_class = StepForm
     prefix = 'Steps'
     factory_kwargs = {'extra':1, 'max_num': 250, 'min_num':1, 'can_order': False, 'can_delete': False}
+
+class ImageInline(InlineFormSetFactory):
+    model = Image
+    forms_class=ImageForm
+    factory_kwargs = {'extra':1, 'max_num': 250, 'min_num':2, 'can_order': False, 'can_delete': False}
 
 
 class CommentDeleteView(DeleteView):
@@ -104,3 +120,29 @@ class CreateRecipeView(LoginRequiredMixin, CreateWithInlinesView):
         form.instance.author = self.request.user
         p.save()
         return redirect('posts:posts_list')
+
+
+class image_view(CreateView):
+    success_url = 'success'
+    template_name = 'recipes/a.html'
+    form_class = ImageForm
+
+    def get(self, request, *args, **kwargs):
+        ImageFormSet = modelformset_factory(Image, form=ImageForm, extra=3)
+        formset = ImageFormSet(queryset=Image.objects.none())
+        return render(request, self.template_name, {'formset': formset})
+
+    def post(self, request, *args, **kwargs):
+        ImageFormSet = modelformset_factory(Image, form=ImageForm, extra=3)
+        formset = ImageFormSet(request.POST, request.FILES, queryset=Image.objects.none())
+        if formset.is_valid():
+            formset.save()
+            return redirect('posts:success')
+        else:
+            return render(request, self.template_name, {'formset' : formset})
+
+
+def success(request):
+    if request.method == 'GET':
+        Images = Image.objects.all()
+        return render(request, 'recipes/success.html', {'images' : Images})

@@ -1,11 +1,13 @@
 from django.urls import path
 from django.views.generic import TemplateView
-from .views import PostDetailView, PostListView, CommentCreateView, CommentDeleteView, CreateRecipeView, PostEditView, PostDeleteView
+from .views import image_view, success, PostDetailView, PostListView, CommentCreateView, CommentDeleteView, CreateRecipeView, PostEditView, PostDeleteView
 
 app_name = 'posts'
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name="recipes/recipes_home.html"), name='recipes_home'),
+    path('a/', image_view.as_view(), name='image_upload'),
+    path('success/', success, name='success'),
     path('posts/', PostListView.as_view(), name='posts_list'),
     path('create/', CreateRecipeView.as_view(), name='create'),
     path('posts/<slug:slug>/', PostDetailView.as_view(), name='post_detail'),
