@@ -4,5 +4,9 @@
     {% for form in formset %}
         {{ form.as_p }}
     {% endfor %}
+    {{ tea_formset.management_form }}
+    {% for form in tea_formset %}
+        {{ form.as_p }}
+    {% endfor %}
     <button type="submit">Upload</button>
 </form>

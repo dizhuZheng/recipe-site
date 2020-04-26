@@ -157,3 +157,10 @@ class Step(models.Model):
 class Image(models.Model):
     name = models.CharField(max_length=50)
     image = models.ImageField(upload_to='images/', null=True, blank=True)
+
+
+class Tea(models.Model):
+    text = models.TextField(max_length=300, null=False, blank=False, help_text='Tea tea tea')
+
+    def __str__(self):
+        return self.text[:15]

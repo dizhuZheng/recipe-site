@@ -3,7 +3,7 @@ from django.forms import formset_factory, modelformset_factory
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
-from .models import Post, Comment, Ingredient, Step, Image
+from .models import Post, Comment, Ingredient, Step, Image, Tea
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.views.generic.edit import DeleteView
@@ -125,24 +125,27 @@ class CreateRecipeView(LoginRequiredMixin, CreateWithInlinesView):
 class image_view(CreateView):
     success_url = 'success'
     template_name = 'recipes/a.html'
-    form_class = ImageForm
+    ImageFormSet = modelformset_factory(Image, form=ImageForm, extra=3)
+    TeaFormSet = modelformset_factory(Tea, fields='__all__', extra=3)
 
     def get(self, request, *args, **kwargs):
-        ImageFormSet = modelformset_factory(Image, form=ImageForm, extra=3)
-        formset = ImageFormSet(queryset=Image.objects.none())
-        return render(request, self.template_name, {'formset': formset})
+        formset = self.ImageFormSet(queryset=Image.objects.none())
+        tea_formset = self.TeaFormSet(queryset=Tea.objects.none())
+        return render(request, self.template_name, {'formset': formset, 'tea_formset': tea_formset})
 
     def post(self, request, *args, **kwargs):
-        ImageFormSet = modelformset_factory(Image, form=ImageForm, extra=3)
-        formset = ImageFormSet(request.POST, request.FILES, queryset=Image.objects.none())
-        if formset.is_valid():
+        formset = self.ImageFormSet(request.POST, request.FILES, queryset=Image.objects.none())
+        tea_formset = self.TeaFormSet(request.POST, queryset=Tea.objects.none())
+        if formset.is_valid() and tea_formset.is_valid():
             formset.save()
+            tea_formset.save()
             return redirect('posts:success')
         else:
-            return render(request, self.template_name, {'formset' : formset})
+            return render(request, self.template_name, {'formset' : formset, 'tea_formset': tea_formset})
 
 
 def success(request):
     if request.method == 'GET':
         Images = Image.objects.all()
-        return render(request, 'recipes/success.html', {'images' : Images})
+        Tea = Tea.objects.all()
+        return render(request, 'recipes/success.html', {'images' : Images, 'tea': Tea})
