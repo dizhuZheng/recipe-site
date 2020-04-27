@@ -144,7 +144,7 @@ class Ingredient(models.Model):
 
 class Step(models.Model):
     text = models.TextField(max_length=300, null=False, blank=False)
-    pic = models.ImageField(upload_to='images/', null=True, blank=True, width_field=100, height_field=100)
+    pic = models.ImageField(upload_to='images/', null=True, blank=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_steps')
 
     def __str__(self):

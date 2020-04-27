@@ -1,24 +1,15 @@
 {% load static %}
 {% load crispy_forms_tags %}
 <body>
-<form method="post" action="">
+<form method="post" action="" enctype="multipart/form-data">
   {% csrf_token %}
-  {{ inlines.0.management_form }}
   <table>
     {{ form.as_table }}
   </table>
   <div class="ingredients">
-    <lable>{{ inlines.0.prefix }}</lable>
-    {% for form in inlines.0 %}
+    {{ ingredient_formset.management_form }}
+    {% for form in ingredient_formset %}
       <p>{{ form }}</p>
-    {% endfor %}
-  </div>
-  <br><br><br>
-  {{ inlines.1.management_form }}
-  <div class="steps">
-    <label>{{ inlines.1.prefix }}</label>
-    {% for form in inlines.1 %}
-      <table>{{ form.as_table }}</table>
     {% endfor %}
   </div>
 <input type="submit" value="Add recipe" class="submit" />

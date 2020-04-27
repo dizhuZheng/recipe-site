@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import formset_factory, modelformset_factory
+from django.forms import formset_factory, modelformset_factory, inlineformset_factory
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -68,6 +68,11 @@ class ImageForm(forms.ModelForm):
         model = Image
         fields = ['name', 'image']
 
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        exclude = ['slug', 'author', 'status']
+
 
 class StepInline(InlineFormSetFactory):
     model = Step
@@ -107,19 +112,41 @@ class PostEditView(UpdateWithInlinesView):
         return reverse_lazy('posts:post_detail', args=[self.kwargs.get('slug')])
 
 
-class CreateRecipeView(LoginRequiredMixin, CreateWithInlinesView):
+class CreateRecipeView(LoginRequiredMixin, CreateView):
     login_url = reverse_lazy('account_login')
     model = Post
-    inlines = [IngredientInline, StepInline]
-    fields = ['title', 'cook_time', 'unit', 'categories']
     template_name = 'recipes/create_recipe.html'
-    success_url = 'posts_list'
+    success_url = 'posts:posts_list'
+    form_class = PostForm
+    IngredientFormSet = inlineformset_factory(Post, Ingredient, exclude=('post',), extra=2, can_delete=False, can_order=False)
+
+    def get(self, request, *args, **kwargs):
+        form = self.get_form(self.form_class)
+        ingredient_formset = self.IngredientFormSet()
+        return render(request, self.template_name, {'form': form, 'ingredient_formset': ingredient_formset})
+
+    def form_invalid(self, form, ingredient_formset):
+        return self.render_to_response(self.get_context_data(form=form,
+                                  ingredient_formset=ingredient_formset,))
 
     def form_valid(self, form):
-        p = form.save(commit=False)
-        form.instance.author = self.request.user
-        p.save()
-        return redirect('posts:posts_list')
+        self.object = form.save(commit=False)
+        self.object.author = self.request.user
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form(self.form_class)
+        ingredient_formset = self.IngredientFormSet(request.POST, queryset=Ingredient.objects.none())
+        if form.is_valid() and ingredient_formset.is_valid():
+            self.object = form.save(commit=False)
+            self.object.author = self.request.user
+            self.object.save()
+            ingredient_formset.instance = self.object
+            ingredient_formset.save()
+            return redirect(self.get_success_url())
+        else:
+            return self.form_invalid(form, ingredient_formset)
 
 
 class image_view(CreateView):
@@ -145,7 +172,8 @@ class image_view(CreateView):
 
 
 def success(request):
+    global Tea
     if request.method == 'GET':
         Images = Image.objects.all()
-        Tea = Tea.objects.all()
-        return render(request, 'recipes/success.html', {'images' : Images, 'tea': Tea})
+        tea = Tea.objects.all()
+        return render(request, 'recipes/success.html', {'images' : Images, 'tea': tea})
