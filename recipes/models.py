@@ -75,7 +75,7 @@ class Post(BaseModel):
         (0, 'Draft'),
         (1, 'Publish')
     ]
-    status = models.IntegerField(choices=STATUS, default=0)
+    status = models.IntegerField(choices=STATUS, default=1)
     cook_time = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1, message='must be greater than 1!')])
     UNIT_CHOICE = [
         ('s', 'seconds'),
@@ -152,15 +152,3 @@ class Step(models.Model):
 
     class Meta:
         verbose_name_plural = 'steps'
-
-
-class Image(models.Model):
-    name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='images/', null=True, blank=True)
-
-
-class Tea(models.Model):
-    text = models.TextField(max_length=300, null=False, blank=False, help_text='Tea tea tea')
-
-    def __str__(self):
-        return self.text[:15]

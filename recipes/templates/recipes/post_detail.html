@@ -16,11 +16,15 @@
       {{ steps.count }}
       {% for step in steps %}
         <li>{{ step.text }}</li>
+        {% if step.pic %}
+          <li><img src="{{ step.pic.url }}" class="img-responsive" style="width: 20%; float: left; margin-right: 10px;" /></li>
+        {% else %}
+          <li><img src="/media/images/noimage.jpg" class="img-responsive" style="width: 20%; float: left; margin-right: 10px;" /></li>
+        {% endif %}
       {% endfor %}
     </ul>
   </div>
   {% if post.author.is_authenticated %}
-  <a href="{% url 'recipes:update_post' slug=post.slug %}">Edit Post</a>
   <a href="{% url 'recipes:delete_post' slug=post.slug %}">Delete Post</a>
   {% endif %}
 </div>

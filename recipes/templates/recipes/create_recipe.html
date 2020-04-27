@@ -12,6 +12,13 @@
       <p>{{ form }}</p>
     {% endfor %}
   </div>
+  <br><br><br>
+  {{ step_formset.management_form }}
+  <div class="steps">
+    {% for form in step_formset %}
+      <table>{{ form.as_table }}</table>
+    {% endfor %}
+  </div>
 <input type="submit" value="Add recipe" class="submit" />
 </form>
 </body>
