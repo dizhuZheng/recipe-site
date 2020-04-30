@@ -1,4 +1,4 @@
-from django import forms
+from django.forms import ModelForm, TextInput, Textarea, ClearableFileInput
 from django.forms import inlineformset_factory
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
@@ -10,6 +10,32 @@ from django.views.generic.edit import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from .fields import GroupedModelChoiceField
 from django.contrib import messages
+
+class StepForm(ModelForm):
+    class Meta:
+        model = Step
+        fields = ('text', 'pic')
+        widgets = {
+            'text': Textarea(attrs={'label': 'Step', 'placeholder': 'Enter the specific step here', 'required': True}),
+            'pic': ClearableFileInput(attrs={'type':"file", 'name':"filePhoto", 'value':"", 'id':"filePhoto",'class':"required borrowerImageFile",
+            'data-errors':"PhotoUploadErrorMsg"})
+            }
+
+
+class PostForm(ModelForm):
+    class Meta:
+        model = Post
+        exclude = ['slug', 'author']
+
+
+class IngredientForm(ModelForm):
+    class Meta:
+        model = Ingredient
+        exclude = ['post']
+        widgets = {
+            'name': TextInput(attrs={'class': 'form-control','placeholder': 'Colby Chess','required': True}),
+            'amount': TextInput(attrs={'class': 'form-control','placeholder': 'eg:2g','required': True}),
+            }
 
 
 class PostListView(ListView):
@@ -50,18 +76,6 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
         return redirect('posts:post_detail', slug=comment.post.slug)
 
 
-class StepForm(forms.ModelForm):
-    class Meta:
-        model = Step
-        fields = ('text', 'pic')
-
-
-class PostForm(forms.ModelForm):
-    class Meta:
-        model = Post
-        exclude = ['slug', 'author']
-
-
 class CommentDeleteView(DeleteView):
     model = Comment
     template_name = 'recipes/confirm_delete_comment.html'
@@ -84,13 +98,14 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
     template_name = 'recipes/create_recipe.html'
     success_url = 'posts:posts_list'
     form_class = PostForm
-    IngredientFormSet = inlineformset_factory(Post, Ingredient, exclude=('post',), extra=2, can_delete=False, can_order=False)
-    StepFormSet = inlineformset_factory(Post, Step, exclude=('post',), extra=2, can_delete=False, can_order=False)
+    IngredientFormSet = inlineformset_factory(Post, Ingredient, form=IngredientForm, extra=2, can_delete=False, can_order=False, min_num=1)
+    StepFormSet = inlineformset_factory(Post, Step, form=StepForm, extra=1, can_delete=False, can_order=False, min_num=1)
+
 
     def get(self, request, *args, **kwargs):
         form = self.get_form(self.form_class)
-        ingredient_formset = self.IngredientFormSet()
-        step_formset = self.StepFormSet()
+        ingredient_formset = self.IngredientFormSet(prefix='ingredients')
+        step_formset = self.StepFormSet(prefix='steps')
         return render(request, self.template_name, {'form': form, 'ingredient_formset': ingredient_formset, 'step_formset': step_formset})
 
     def form_invalid(self, form, ingredient_formset, step_formset):
@@ -105,8 +120,8 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
 
     def post(self, request, *args, **kwargs):
         form = self.get_form(self.form_class)
-        ingredient_formset = self.IngredientFormSet(request.POST, queryset=Ingredient.objects.none())
-        step_formset = self.StepFormSet(request.POST, request.FILES, queryset=Ingredient.objects.none())
+        ingredient_formset = self.IngredientFormSet(request.POST, queryset=Ingredient.objects.none(), prefix='ingredients')
+        step_formset = self.StepFormSet(request.POST, request.FILES, queryset=Ingredient.objects.none(), prefix='steps')
         if form.is_valid() and ingredient_formset.is_valid() and step_formset.is_valid():
             self.object = form.save(commit=False)
             self.object.author = self.request.user
@@ -117,4 +132,4 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
             step_formset.save()
             return redirect(self.get_success_url())
         else:
-            return self.form_invalid(form, ingredient_formset)
+            return self.form_invalid(form, ingredient_formset, step_formset)
