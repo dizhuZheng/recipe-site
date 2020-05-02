@@ -1,4 +1,4 @@
-from django.forms import ModelForm, TextInput, Textarea
+from django.forms import ModelForm, TextInput, Textarea, ClearableFileInput
 from django.forms import inlineformset_factory
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
@@ -16,7 +16,9 @@ class StepForm(ModelForm):
         model = Step
         fields = ('text', 'pic')
         widgets = {
-            'text': Textarea(attrs={'label': 'Step', 'placeholder': 'Enter the specific step here','required': True}),
+            'text': Textarea(attrs={'label': 'Step', 'placeholder': 'Enter the specific step here', 'required': True}),
+            'pic': ClearableFileInput(attrs={'type':"file", 'name':"filePhoto", 'value':"", 'id':"filePhoto", 'class':"required borrowerImageFile",
+            'data-errors':"PhotoUploadErrorMsg"})
             }
 
 
@@ -102,24 +104,18 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
 
     def get(self, request, *args, **kwargs):
         form = self.get_form(self.form_class)
-        ingredient_formset = self.IngredientFormSet()
-        step_formset = self.StepFormSet()
+        ingredient_formset = self.IngredientFormSet(prefix='ingredients')
+        step_formset = self.StepFormSet(prefix='steps')
         return render(request, self.template_name, {'form': form, 'ingredient_formset': ingredient_formset, 'step_formset': step_formset})
 
     def form_invalid(self, form, ingredient_formset, step_formset):
         return self.render_to_response(self.get_context_data(form=form,
                                   ingredient_formset=ingredient_formset, step_formset=step_formset))
 
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.author = self.request.user
-        self.object.save()
-        return redirect(self.get_success_url())
-
     def post(self, request, *args, **kwargs):
         form = self.get_form(self.form_class)
-        ingredient_formset = self.IngredientFormSet(request.POST, queryset=Ingredient.objects.none())
-        step_formset = self.StepFormSet(request.POST, request.FILES, queryset=Ingredient.objects.none())
+        ingredient_formset = self.IngredientFormSet(request.POST, queryset=Ingredient.objects.none(), prefix='ingredients')
+        step_formset = self.StepFormSet(request.POST, request.FILES, queryset=Ingredient.objects.none(), prefix='steps')
         if form.is_valid() and ingredient_formset.is_valid() and step_formset.is_valid():
             self.object = form.save(commit=False)
             self.object.author = self.request.user

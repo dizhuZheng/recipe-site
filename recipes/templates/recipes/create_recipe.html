@@ -1,28 +1,31 @@
 {% load static %}
-{% load crispy_forms_tags %}
+{% load bootstrap4 %}
 <body>
-<form method="post" action="">
+<form method="post" action="" enctype="multipart/form-data">
   {% csrf_token %}
   <table>
-    {{ form.as_table }}
+    {% bootstrap_form form %}
   </table>
   <div id="ingredients">
-    {{ ingredient_formset.management_form|crispy }}
+    {{ ingredient_formset.management_form }}
+    <label>{{ ingredient_formset.prefix }}</label>
     {% for form in ingredient_formset %}
       <p>{{ form }}</p>
     {% endfor %}
   </div>
   <br><br><br>
   <div id="steps">
-    {{ step_formset.management_form|crispy }}
+    {{ step_formset.management_form }}
+    <label>{{ step_formset.prefix }}</label>
     {% for form in step_formset %}
     <div class="specific-step">
       <p>{{ form.text }}</p>
       <p>{{ form.pic }}</p>
+      <img id="previewHolder" alt="Uploaded Image Preview Holder" width="250px" height="250px"/>
     </div>
     {% endfor %}
   </div>
-<input type="submit" value="Add recipe" class="submit" />
+{% buttons %}<input type="submit" value="Add recipe" class="submit" />{% endbuttons %}
 </form>
 </body>
 <head>
@@ -36,6 +39,23 @@
   $('div#steps').formset({
     prefix: '{{ step_formset.prefix }}',
     addCssClass: "add",
+    added:"readURL",
+  });
+  $('#move-up').click(function(){
+    var cur_li = $(this).parent();
+    var prev_li = cur_li.prev();
+        if(prev_li.length != 0){
+            prev_li.before(cur_li);
+            }
+    });
+  function readURL(input){
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        $('#previewHolder').attr('src', e.target.result);}
+      reader.readAsDataURL(input.files[0]);}}
+  $('#filePhoto').change(function() {
+    readURL(this);
   });
   $('#move-up').click(function(){
     var cur_li = $(this).parent();
