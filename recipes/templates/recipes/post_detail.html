@@ -24,9 +24,18 @@
       {% endfor %}
     </ul>
   </div>
-  {% if post.author.is_authenticated %}
-  <a href="{% url 'recipes:delete_post' slug=post.slug %}">Delete Post</a>
+  {% if request.user.is_authenticated %}
+    {% ifequal request.user post.author %}
+    <a href="{% url 'recipes:delete_post' slug=post.slug %}">Delete Post</a>
+    {% endifequal %}
   {% endif %}
+  {% ifnotequal request.user post.author %}
+  <form method="POST" action="{% url 'recipes:post_favorite' slug=post.slug %}">
+    {% csrf_token %}
+    <input type="hidden" name="supporttype" />
+    <input type="submit" value="Save to My Favorites" />
+  </form>
+  {% endifnotequal %}
 </div>
 <div>
   {% for comment in comments.all %}
@@ -38,11 +47,46 @@
     {% endif %}
     <strong>{{ comment.author }}</strong>
     <p>{{ comment.text|linebreaks }}</p>
-    {% if user == comment.author or user == post.author %}
+    {% ifequal request.user comment.author %}
       <a href="{% url 'recipes:delete_comment' slug=post.slug pk=comment.id %}">Delete comment</a>
-    {% endif %}
+    {% endifequal %}
   {% empty %}
       <p>No comments here yet :-(</p>
   {% endfor %}
   <a href="{% url 'recipes:add_comment' slug=post.slug %}">Add comment</a>
+  {% if messages %}
+  <div class="container">
+      {% for message in messages %}
+      <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-secondary{% endif %} alert-dismissible rounded-0 fade show" role="alert">
+          {{ message }}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      {% endfor %}
+  </div>
+{% endif %}
 </div>
+<script type="text/javascript">
+  function getCookie(name){
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;}}}
+    return cookieValue;}
+  var csrftoken = getCookie('csrftoken');
+  function csrfSafeMethod(method) {
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+      }
+  });
+</script>

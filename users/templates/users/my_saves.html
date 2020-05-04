@@ -1,0 +1,8 @@
+<h1>My Saves</h1>
+{% if my_saves %}
+{% for i in my_saves %}
+    <li><strong><a href="{{ i.get_absolute_url }}">{{ i.title }}</a></strong></li>
+{% endfor %}
+{% else %}
+<p>No saves.</p>
+{% endif %}

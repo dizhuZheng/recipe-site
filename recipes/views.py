@@ -3,13 +3,15 @@ from django.forms import inlineformset_factory
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from .models import Post, Comment, Ingredient, Step
+from .models import Post, Comment, Ingredient, Step, LikeCount
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.views.generic.edit import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from .fields import GroupedModelChoiceField
 from django.contrib import messages
+
 
 class StepForm(ModelForm):
     class Meta:
@@ -25,7 +27,7 @@ class StepForm(ModelForm):
 class PostForm(ModelForm):
     class Meta:
         model = Post
-        exclude = ['slug', 'author']
+        exclude = ['slug', 'author', 'favorites']
 
 
 class IngredientForm(ModelForm):
@@ -62,17 +64,33 @@ class PostDetailView(DetailView):
         return context
 
 
+@login_required
+def favorite(request, slug):
+    p = get_object_or_404(Post, slug=slug)
+    if request.method == 'POST':
+        s = request.session.get('slug')
+        if s == slug:
+            return HttpResponse("You've already saved it!")
+        p.favorites.add(request.user)
+        request.session['slug'] = slug
+        messages.success(request, 'Successfully Saved!')
+        return redirect('posts:post_detail', slug=slug)
+    else:
+        return HttpResponse('Error just happened.')
+
+
 class CommentCreateView(LoginRequiredMixin, CreateView):
     login_url = reverse_lazy('account_login')
     model = Comment
     template_name = 'recipes/add_comment_to_post.html'
     fields = ['text']
 
-    def form_valid(self, form):
+    def form_valid(self,form):
         comment = form.save(commit=False)
         form.instance.author = self.request.user
         comment.post_id = Post.objects.get(slug=self.kwargs.get('slug')).id
         comment.save()
+        messages.success(self.request, 'Comment has been posted!')
         return redirect('posts:post_detail', slug=comment.post.slug)
 
 
@@ -81,6 +99,7 @@ class CommentDeleteView(DeleteView):
     template_name = 'recipes/confirm_delete_comment.html'
 
     def get_success_url(self):
+        messages.success(self.request, 'Comment has been deleted!')
         return reverse_lazy('posts:post_detail', args=[self.kwargs.get('slug')])
 
 
@@ -100,7 +119,6 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
     form_class = PostForm
     IngredientFormSet = inlineformset_factory(Post, Ingredient, form=IngredientForm, extra=2, can_delete=False, can_order=False, min_num=1)
     StepFormSet = inlineformset_factory(Post, Step, form=StepForm, extra=1, can_delete=False, can_order=False, min_num=1)
-
 
     def get(self, request, *args, **kwargs):
         form = self.get_form(self.form_class)
@@ -124,6 +142,14 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
             ingredient_formset.save()
             step_formset.instance = self.object
             step_formset.save()
+            messages.success(self.request, 'Recipe has been posted!')
             return redirect(self.get_success_url())
         else:
             return self.form_invalid(form, ingredient_formset, step_formset)
+
+
+@login_required
+def like_up(request):
+    user = request.user
+    content_type = request.GET.get('content_type')
+    content_type = ContentType.objects.get(model=content_type)

@@ -1,0 +1,8 @@
+<h1>My Drafts</h1>
+{% if my_drafts %}
+ {% for draft in my_drafts %}
+    <li><strong><a href="{{ draft.get_absolute_url }}">{{ draft.title }}</a></strong></li>
+ {% endfor %}
+{% else %}
+<p>No drafts.</p>
+{% endif %}

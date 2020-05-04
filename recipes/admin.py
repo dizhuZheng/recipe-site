@@ -7,7 +7,7 @@ admin.site.register(Category)
 admin.site.register(Ingredient)
 
 class PostAdmin(admin.ModelAdmin):
-    exclude = ('slug',)
+    exclude = ('favorites', )
     list_display = ('title', 'slug', 'status', 'created_on')
 
 class StepAdmin(admin.ModelAdmin):

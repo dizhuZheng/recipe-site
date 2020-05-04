@@ -3,11 +3,11 @@ from django.utils import timezone
 from django.urls import reverse
 from users.models import UserProfile
 from django.template.defaultfilters import slugify
-import uuid
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 from  django.core.validators import MinValueValidator
 from .unique_slug import unique_slugify
 
-unique_id = uuid.uuid4().hex
 
 class BaseModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, verbose_name='Created Time')
@@ -41,6 +41,7 @@ class Post(BaseModel):
     author = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='post_author')
     title = models.CharField(max_length=150)
     slug = models.SlugField(unique=True, max_length=100)
+    favorites = models.ManyToManyField(UserProfile, related_name='post_favo')
     CAT_CHOICE = [
         ('Flavors', (
             (11, 'spicy'),
@@ -106,7 +107,7 @@ class Comment(BaseModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_comments')
 
     class Meta:
-        ordering = ['-created_on']
+        ordering = ['created_on']
 
     def get_absolute_url(self):
         return reverse('posts:post_detail', kwargs={'id': self.id, 'slug': self.post.slug})
@@ -152,3 +153,10 @@ class Step(models.Model):
 
     class Meta:
         verbose_name_plural = 'steps'
+
+
+class LikeCount(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.DO_NOTHING)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    like_num = models.IntegerField(default=0)

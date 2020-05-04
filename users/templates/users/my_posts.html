@@ -1,0 +1,8 @@
+<h1>My Posts</h1>
+{% if my_posts %}
+    {% for post in my_posts %}
+    <li><strong><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></strong></li>
+    {% endfor %}
+{% else %}
+<p>No posts :-(</p>
+{% endif %}
