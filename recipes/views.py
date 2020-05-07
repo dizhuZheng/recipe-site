@@ -11,6 +11,7 @@ from django.views.generic.edit import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from .fields import GroupedModelChoiceField
 from django.contrib import messages
+from django.http import JsonResponse
 
 
 class StepForm(ModelForm):
@@ -61,22 +62,61 @@ class PostDetailView(DetailView):
         context['ingredients'] = self.object.post_ingredients.all()
         context['steps'] = self.object.post_steps.all()
         context['comments'] = self.object.post_comments.all()
+        context['save_status'] = False
+        if self.object.favorites.filter(username=self.request.user).exists():
+            context['save_status'] = True
         return context
 
 
 @login_required
 def favorite(request, slug):
     p = get_object_or_404(Post, slug=slug)
-    if request.method == 'POST':
-        s = request.session.get('slug')
-        if s == slug:
-            return HttpResponse("You've already saved it!")
-        p.favorites.add(request.user)
-        request.session['slug'] = slug
-        messages.success(request, 'Successfully Saved!')
-        return redirect('posts:post_detail', slug=slug)
+    action = request.POST.get("like")
+    if action:
+        try:
+            p.favorites.add(request.user)
+            messages.success(request, 'Successfully Saved!')
+            return redirect('posts:post_detail', slug=slug)
+        except:
+            return HttpResponse('Error just happened.')
     else:
-        return HttpResponse('Error just happened.')
+        return HttpResponse('No action specified.')
+
+
+@login_required
+def like_up(request, slug):
+    content_type = request.GET.get('content_type')
+    object_id = request.GET.get('object_id')
+    is_like = request.GET.get('is_like')
+    like_count = LikeCount.obejcts.count()
+
+    if is_like:
+        if LikeCount.objects.filter(content_type=content_type, object_id=object_id, like_user=request.user).exists():
+            LikeCount.objects.get(content_type=content_type, object_id=object_id, like_user=request.user).delete()
+            like_count -= 1
+            like_count.save()
+            return success_response(like_count.like_num)
+        else:
+            like_record = LikeCount.objects.create(content_type=content_type, object_id=object_id, like_user=request.user)
+            like_count += 1
+            like_record.save()
+            return success_response(like_record.like_num)
+    else:
+        return error_response('No like exists!')
+
+
+def success_response(like_num):
+    data = {}
+    data['status'] = 'SUCCESS'
+    data['like_num'] = like_num
+    return JsonResponse(data)
+
+
+def error_response(message):
+    data = {}
+    data['status'] = 'ERROR'
+    data['message'] = message
+    return JsonResponse(data)
 
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
@@ -146,10 +186,3 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
             return redirect(self.get_success_url())
         else:
             return self.form_invalid(form, ingredient_formset, step_formset)
-
-
-@login_required
-def like_up(request):
-    user = request.user
-    content_type = request.GET.get('content_type')
-    content_type = ContentType.objects.get(model=content_type)

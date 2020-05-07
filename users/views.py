@@ -27,8 +27,7 @@ def change_profile(request):
             return redirect('users:profile')
     else:
         form = ProfileForm(instance=request.user)
-    return render(request, 'users/change_profile.html', context={'form': form
-        })
+    return render(request, 'users/change_profile.html', context={'form': form})
 
 
 @login_required

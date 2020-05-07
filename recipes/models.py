@@ -87,6 +87,7 @@ class Post(BaseModel):
 
     class Meta:
         ordering = ["-created_on"]
+        index_together = (('id', 'slug'))
 
     def __str__(self):
         return self.title
@@ -156,7 +157,6 @@ class Step(models.Model):
 
 
 class LikeCount(models.Model):
-    content_type = models.ForeignKey(ContentType, on_delete=models.DO_NOTHING)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
-    like_num = models.IntegerField(default=0)
+    content_object = GenericForeignKey('content_type', 'object_id') # this is not a field
