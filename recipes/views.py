@@ -1,9 +1,10 @@
 from django.forms import ModelForm, TextInput, Textarea, ClearableFileInput
 from django.forms import inlineformset_factory
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from .models import Post, Comment, Ingredient, Step, LikeCount
+from .models import Post, Comment, Ingredient, Step, LikeCount, Foo
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
@@ -12,6 +13,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from .fields import GroupedModelChoiceField
 from django.contrib import messages
 from django.http import JsonResponse
+import json
 
 
 class StepForm(ModelForm):
@@ -56,6 +58,7 @@ class PostDetailView(DetailView):
     model = Post
     template_name = 'recipes/post_detail.html'
     context_object_name = 'post'
+    Foo.objects.filter(ratings__isnull=False).order_by('ratings__average')
 
     def get_context_data(self, **kwargs):
         context = super(PostDetailView, self).get_context_data(**kwargs)
@@ -63,12 +66,14 @@ class PostDetailView(DetailView):
         context['steps'] = self.object.post_steps.all()
         context['comments'] = self.object.post_comments.all()
         context['save_status'] = False
+        context['likes'] = len(self.object.likes.all())
         if self.object.favorites.filter(username=self.request.user).exists():
             context['save_status'] = True
         return context
 
 
 @login_required
+@csrf_exempt
 def favorite(request, slug):
     p = get_object_or_404(Post, slug=slug)
     action = request.POST.get("like")
@@ -83,28 +88,6 @@ def favorite(request, slug):
         return HttpResponse('No action specified.')
 
 
-@login_required
-def like_up(request, slug):
-    content_type = request.GET.get('content_type')
-    object_id = request.GET.get('object_id')
-    is_like = request.GET.get('is_like')
-    like_count = LikeCount.obejcts.count()
-
-    if is_like:
-        if LikeCount.objects.filter(content_type=content_type, object_id=object_id, like_user=request.user).exists():
-            LikeCount.objects.get(content_type=content_type, object_id=object_id, like_user=request.user).delete()
-            like_count -= 1
-            like_count.save()
-            return success_response(like_count.like_num)
-        else:
-            like_record = LikeCount.objects.create(content_type=content_type, object_id=object_id, like_user=request.user)
-            like_count += 1
-            like_record.save()
-            return success_response(like_record.like_num)
-    else:
-        return error_response('No like exists!')
-
-
 def success_response(like_num):
     data = {}
     data['status'] = 'SUCCESS'
@@ -117,6 +100,29 @@ def error_response(message):
     data['status'] = 'ERROR'
     data['message'] = message
     return JsonResponse(data)
+
+
+@csrf_exempt
+@login_required
+def like_up(request, slug):
+    p = get_object_or_404(Post, slug=slug)
+    like_count = len(LikeCount.objects.all())
+    is_like = request.GET.get('is_like')
+
+    if is_like:
+        if LikeCount.objects.filter(content_object=p, author=request.user).exists():
+            return error_response('You already liked it!')
+        else:
+            like = LikeCount.objects.create(content_object=p, author=request.user)
+            like.save()
+            return success_response(like_count)
+    else:
+        if LikeCount.objects.filter(content_object=p, author=request.user).exists():
+            l = LikeCount.objects.get(content_object=p, author=request.user).delete()
+            l.save()
+            return success_response(like_count)
+        else:
+            return error_response('You don\'t have record!')
 
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
@@ -186,3 +192,23 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
             return redirect(self.get_success_url())
         else:
             return self.form_invalid(form, ingredient_formset, step_formset)
+
+
+def test_page(request, slug):
+    p = get_object_or_404(Post, slug=slug)
+    like_count = len(p.likes.all())
+    return render(request, 'recipes/post_detail.html', {'likes': like_count})
+
+
+@csrf_exempt
+def test_ajax(request, slug):
+    p = get_object_or_404(Post, slug=slug)
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'You haven\'t logged in yet!!!'})
+    if LikeCount.objects.filter(posts__id=p.id, author=request.user).exists():
+        return JsonResponse({'message': 'You already liked it!!!'})
+    else:
+        like = LikeCount(content_object=p, author=request.user)
+        like.save()
+        like_count = len(p.likes.all())
+        return JsonResponse({'likes': like_count, 'message': 'Success!!!'})

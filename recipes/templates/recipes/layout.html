@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}BooBooRecipe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <style>
+        img {
+          display: block;
+          margin-left: auto;
+        }
+        form{
+          width:50%;
+          height: 50%;
+          margin-left: 80px;
+          margin-top: 30px;
+        }
+
+        .fa {
+          padding: 20px;
+          font-size: 100px;
+          width: 55px;
+          text-align: center;
+          text-decoration: none;
+          margin: 0px 10px 10px 0;
+          border-radius: 150%;
+        }
+
+        .footer {
+          position: fixed;
+          left: 0;
+          bottom: 0;
+          color: white;
+          text-align: center;
+        }
+
+        .fa:hover {
+            opacity: 0.8;
+        }
+
+        .fa-facebook {
+          background: #3B5998;
+          color: white;
+        }
+
+        .fa-twitter {
+          background: #55ACEE;
+          color: white;
+        }
+        .fa-snapchat-ghost {
+          background: #fffc00;
+          color: white;
+          text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+        }
+        .fa-github{
+          background:purple;
+          color:white;
+        }
+    </style>
+  </head>
+  <body>
+    {% block content %}{% endblock %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col footer" style="background-color:rgb(56, 56, 65);"><h1>Hello Topher</h1>
+          <h1>Hello Topher</h1>
+          <h1>Hello Topher</h1></div>
+      </div>
+    </div>
+    {% block css %}{% endblock %}
+    {% block js %}{% endblock %}
+  </body>
+</html>

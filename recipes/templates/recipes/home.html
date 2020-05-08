@@ -1,0 +1,31 @@
+{% extends 'recipes/layout.html' %}
+{% load static %}
+{% load bootstrap4 %}
+{% block content %}
+{% include 'recipes/nav.html' %}
+<div id="slidershow" class="carousel slide" data-ride="carousel" data-interval = 3000 data-pause = "hover" data-wrap="true"
+  style="margin-top: -2rem; width: 70%; height: 70%; margin-left:auto; margin-right:auto;" style="display: block">
+    <ol class="carousel-indicators">
+      <li class="active" data-target="#slidershow" data-slide-to="0" ></li>
+      <li data-target="#slidershow" data-slide-to="1"></li>
+      <li data-target="#slidershow" data-slide-to="2"></li>
+      <li data-target="#slidershow" data-slide-to="3"></li>
+    </ol>
+    <div class="carousel-inner">
+        <div class="item active">
+          <img src="{% static 'recipes/fast-food.jpg' %}"/>
+        </div>
+        {% for img in imgs %}
+        <div class="item ">
+            <img src="../../static/recipes/{{img}} "/>
+        </div>
+        {% endfor %}
+    </div>
+    <a class="left carousel-control" href="#slidershow" role="button" data-slide="prev" >
+    <span class="glyphicon glyphicon-chevron-left"></span>
+    </a>
+    <a class="right carousel-control" href="#slidershow" role="button" data-slide="next">
+      <span class="glyphicon glyphicon-chevron-right"></span>
+    </a>
+</div>
+{% endblock %}

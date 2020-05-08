@@ -1,44 +1,59 @@
 {% load static %}
+{% load ratings %}
 <div>
-  <p> {{ post.updated_on }}</p>
-  <h2>{{ post.title }}</h2>
-  <div>
-    {{ ingredients.count }}
-    {% for i in ingredients %}
-    <label class="container">
-      {{ i.name }}{{ i.amount}}
-      {% if i.unit %}
-        {{ i.unit }}
-      {% endif %}
-      <input type="checkbox">
-      <span class="checkmark"></span>
-    </label>
-    {% endfor %}
-  </div>
-  <div>
-    <ul>
-      {{ steps.count }}
-      {% for step in steps %}
-        <li>{{ step.text }}</li>
+  <p> Updated at:{{ post.updated_on }}</p>
+  <h1>{{ post.title }}</h1>
+  <h3>Created by -- {{ post.author }}</h3>
+  <br>
+<div>
+  <h4>{{ ingredients.count }} ingredients</h4>
+  {% for i in ingredients %}
+  <label class="container">
+    {{ i.name }}{{ i.amount}}
+    {% if i.unit %}
+      {{ i.unit }}
+    {% endif %}
+    <input type="checkbox">
+    <span class="checkmark"></span>
+  </label>
+  {% endfor %}
+</div>
+<br>
+<h4>Steps:</h4>
+<br>
+<ol>
+  {% for step in steps %}
+    <li>
+      <div>{{ step.text }}</div>
+      <div>
         {% if step.pic %}
-          <li><img src="{{ step.pic.url }}" class="img-responsive" style="width: 20%; float: left; margin-right: 10px;" /></li>
+          <img src="{{ step.pic.url }}" class="img-responsive" style="width: 20%; float: left;" />
         {% else %}
-          <li><img src="/media/images/noimage.jpg" class="img-responsive" style="width: 20%; float: left; margin-right: 10px;" /></li>
+          <img src="/media/images/noimage.jpg" class="img-responsive" style="width: 20%; float: left;" />
         {% endif %}
-      {% endfor %}
-    </ul>
-  </div>
+      </div>
+    </li>
+  {% endfor %}
+</ol>
+<div>
+  <input id="like" type="submit" value="Good Recipe">
+  <p id="test1">({{ likes }})</p>
+  <p id="test2"></p>
+  {% ratings object %}
+</div>
+<div>
   {% if request.user.is_authenticated %}
     {% ifequal request.user post.author %}
     <a href="{% url 'recipes:delete_post' slug=post.slug %}">Delete Post</a>
     {% endifequal %}
   {% endif %}
+</div>
+<div>
   {% ifnotequal request.user post.author %}
     {% if not save_status %}
     <form method="POST" action="{% url 'recipes:post_favorite' slug=post.slug %}">
-      {% csrf_token %}
       <input type="hidden" name="supporttype" />
-      <input type="submit" value="Save to favorites" name='like'/><i class='fas fa-heart' style='font-size:48px;color:red'></i>
+      <input type="submit" value="Save to favorites" name='like'/>
     </form>
     {% endif %}
   {% endifnotequal %}
@@ -73,42 +88,25 @@
   </div>
 {% endif %}
 </div>
+<link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
+<script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
+<script src='https://kit.fontawesome.com/a076d05399.js'></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script type="text/javascript">
-  function changeLike(obj, content_type, object_id){
-    var is_like = null;
-    $.ajax({
-      url: '/like_up',
-      type: 'GET',
-      data:{
-        content_type: content_type,
-        object_id: object_id,
-        is_like: is_like,
-      },
-      cache: false,
-      success: function (data) {
-                console.log(data);
-                if (data['status'] == 'SUCCESS'){
-                    var record = $(obj.getElementsByClassName('glyphicon'))
-                    if (is_like){
-                        record.addClass('active')
-                    }
-                    else {
-                        record.removeClass('active')
-                    }
-                    var like_num = $(obj.getElementsByClassName('like_num'))
-                    like_num.text('（' + data['like_num'] + '）')
-
-                }
-                else {
-                    alert(data['message'])
-                }
-            },
-            error: function (xhr) {
-                console.log(xhr)
-            }
-        });
-        return false;
-      };
+$(document).ready(function(){
+  $('#like').click(function(){
+      $.ajax({
+          url:'ajax/',
+          type:"post",
+          dataType:"json",
+          success:function(data){
+              $('#test1').html(data.likes)
+              alert(data.message)
+              $('#1').addClass("fa fa-thumbs-up")
+          }
+      })
+  })
+})
 </script>
 <style>
   /* The container */
@@ -124,7 +122,6 @@
     -ms-user-select: none;
     user-select: none;
   }
-
   /* Hide the browser's default checkbox */
   .container input {
     position: absolute;

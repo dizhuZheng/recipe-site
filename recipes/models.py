@@ -7,7 +7,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from  django.core.validators import MinValueValidator
 from .unique_slug import unique_slugify
-
+from django.contrib.contenttypes.fields import GenericRelation
+from star_ratings.models import Rating
 
 class BaseModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, verbose_name='Created Time')
@@ -37,11 +38,19 @@ class Category(models.Model):
         return ' -> '.join(full_path[::-1])
 
 
+class LikeCount(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id') # this is not a field
+    author = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+
+
 class Post(BaseModel):
     author = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='post_author')
     title = models.CharField(max_length=150)
     slug = models.SlugField(unique=True, max_length=100)
     favorites = models.ManyToManyField(UserProfile, related_name='post_favo')
+    likes = GenericRelation(LikeCount, related_query_name='posts')  # no changes detected in db
     CAT_CHOICE = [
         ('Flavors', (
             (11, 'spicy'),
@@ -156,7 +165,6 @@ class Step(models.Model):
         verbose_name_plural = 'steps'
 
 
-class LikeCount(models.Model):
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id') # this is not a field
+class Foo(models.Model):
+    bar = models.CharField(max_length=100)
+    ratings = GenericRelation(Rating, related_query_name='foos')

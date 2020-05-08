@@ -1,32 +1,40 @@
+{% include "base.html" %}
 {% load static %}
 {% load bootstrap4 %}
 <body>
-<form method="post" action="" enctype="multipart/form-data">
-  {% csrf_token %}
-  <table>
-    {% bootstrap_form form %}
-  </table>
-  <div id="ingredients">
-    {{ ingredient_formset.management_form }}
-    <label>{{ ingredient_formset.prefix }}</label>
-    {% for form in ingredient_formset %}
-      <p>{{ form }}</p>
-    {% endfor %}
-  </div>
-  <br><br><br>
-  <div id="steps">
-    {{ step_formset.management_form }}
-    <label>{{ step_formset.prefix }}</label>
-    {% for form in step_formset %}
-    <div class="specific-step">
-      <p>{{ form.text }}</p>
-      <p>{{ form.pic }}</p>
-      <img id="previewHolder" alt="Uploaded Image Preview Holder" width="250px" height="250px"/>
-    </div>
-    {% endfor %}
-  </div>
-{% buttons %}<input type="submit" value="Add recipe" class="submit" />{% endbuttons %}
-</form>
+  <div class="container">
+    <h2>Create a recipe</h2>
+    <form method="post" action="" enctype="multipart/form-data">
+      {% csrf_token %}
+      <table>
+        {% bootstrap_form form %}
+      </table>
+      <div id="ingredients">
+        {{ ingredient_formset.management_form }}
+        <label>{{ ingredient_formset.prefix }}</label>
+        {% for form in ingredient_formset %}
+          <form class="form-inline">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name">
+            <label for="amount">Amount</label>
+            <input type="text" class="form-control" id="amount" placeholder="amount" required>
+          </form>
+        {% endfor %}
+      </div>
+      <br><br><br>
+      <div id="steps">
+        {{ step_formset.management_form }}
+        <label>{{ step_formset.prefix }}</label>
+        {% for form in step_formset %}
+        <div class="specific-step">
+          <p>{{ form.text }}</p>
+          <p>{{ form.pic }}</p>
+          <img id="previewHolder" alt="Uploaded Image Preview Holder" width="250px" height="250px"/>
+        </div>
+        {% endfor %}
+      </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
 </body>
 <head>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
