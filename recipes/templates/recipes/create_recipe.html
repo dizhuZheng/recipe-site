@@ -1,9 +1,7 @@
-{% include "base.html" %}
 {% load static %}
 {% load bootstrap4 %}
 <body>
   <div class="container">
-    <h2>Create a recipe</h2>
     <form method="post" action="" enctype="multipart/form-data">
       {% csrf_token %}
       <table>
@@ -29,7 +27,7 @@
         <div class="specific-step">
           <p>{{ form.text }}</p>
           <p>{{ form.pic }}</p>
-          <img id="previewHolder" alt="Uploaded Image Preview Holder" width="250px" height="250px"/>
+          <img alt="preview holder" width="250px" height="250px"/>
         </div>
         {% endfor %}
       </div>
@@ -56,15 +54,15 @@
             prev_li.before(cur_li);
             }
     });
-  function readURL(input){
-    if (input.files && input.files[0]) {
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        $('#previewHolder').attr('src', e.target.result);}
-      reader.readAsDataURL(input.files[0]);}}
-  $('#filePhoto').change(function() {
-    readURL(this);
-  });
+    count = 0;
+    var loadFile = function(event) {
+      var output = document.getElementsByTagName("img")[count];
+      output.src = URL.createObjectURL(event.target.files[0]);
+      output.onload = function() {
+        URL.revokeObjectURL(output.src) // free memory
+    }
+    count += 1;
+  };
   $('#move-up').click(function(){
     var cur_li = $(this).parent();
     var prev_li = cur_li.prev();

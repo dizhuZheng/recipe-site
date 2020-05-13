@@ -22,8 +22,8 @@ class StepForm(ModelForm):
         fields = ('text', 'pic')
         widgets = {
             'text': Textarea(attrs={'label': 'Step', 'placeholder': 'Enter the specific step here', 'required': True}),
-            'pic': ClearableFileInput(attrs={'type':"file", 'name':"filePhoto", 'value':"", 'id':"filePhoto", 'class':"required borrowerImageFile",
-            'data-errors':"PhotoUploadErrorMsg"})
+            'pic': ClearableFileInput(attrs={'type':"file", 'name':"filePhoto", 'class':"required borrowerImageFile",
+            'onchange':"loadFile(event)", 'data-errors':"PhotoUploadErrorMsg"})
             }
 
 
