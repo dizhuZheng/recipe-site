@@ -22,9 +22,9 @@ class StepForm(ModelForm):
         fields = ('text', 'pic')
         widgets = {
             'text': Textarea(attrs={'label': 'Step', 'placeholder': 'Enter the specific step here', 'required': True}),
-            'pic': ClearableFileInput(attrs={'type':"file", 'name':"filePhoto", 'class':"required borrowerImageFile",
-            'onchange':"loadFile(event)", 'data-errors':"PhotoUploadErrorMsg"})
-            }
+            'pic': ClearableFileInput(attrs={'type':"file", 'name':"filePhoto", 'class':"required borrowerImageFile", 'onchange':"loadFile(event)",
+            'data-errors':"PhotoUploadErrorMsg"})
+        }
 
 
 class PostForm(ModelForm):
@@ -88,43 +88,6 @@ def favorite(request, slug):
         return HttpResponse('No action specified.')
 
 
-def success_response(like_num):
-    data = {}
-    data['status'] = 'SUCCESS'
-    data['like_num'] = like_num
-    return JsonResponse(data)
-
-
-def error_response(message):
-    data = {}
-    data['status'] = 'ERROR'
-    data['message'] = message
-    return JsonResponse(data)
-
-
-@csrf_exempt
-@login_required
-def like_up(request, slug):
-    p = get_object_or_404(Post, slug=slug)
-    like_count = len(LikeCount.objects.all())
-    is_like = request.GET.get('is_like')
-
-    if is_like:
-        if LikeCount.objects.filter(content_object=p, author=request.user).exists():
-            return error_response('You already liked it!')
-        else:
-            like = LikeCount.objects.create(content_object=p, author=request.user)
-            like.save()
-            return success_response(like_count)
-    else:
-        if LikeCount.objects.filter(content_object=p, author=request.user).exists():
-            l = LikeCount.objects.get(content_object=p, author=request.user).delete()
-            l.save()
-            return success_response(like_count)
-        else:
-            return error_response('You don\'t have record!')
-
-
 class CommentCreateView(LoginRequiredMixin, CreateView):
     login_url = reverse_lazy('account_login')
     model = Comment
@@ -163,8 +126,8 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
     template_name = 'recipes/create_recipe.html'
     success_url = 'posts:posts_list'
     form_class = PostForm
-    IngredientFormSet = inlineformset_factory(Post, Ingredient, form=IngredientForm, extra=2, can_delete=False, can_order=False, min_num=1)
-    StepFormSet = inlineformset_factory(Post, Step, form=StepForm, extra=1, can_delete=False, can_order=False, min_num=1)
+    IngredientFormSet = inlineformset_factory(Post, Ingredient, form=IngredientForm, extra=2, can_delete=True, can_order=False, min_num=1)
+    StepFormSet = inlineformset_factory(Post, Step, form=StepForm, extra=1, can_delete=True, can_order=False, min_num=1)
 
     def get(self, request, *args, **kwargs):
         form = self.get_form(self.form_class)
@@ -179,7 +142,7 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
         form = self.get_form(self.form_class)
         ingredient_formset = self.IngredientFormSet(request.POST, queryset=Ingredient.objects.none(), prefix='ingredients')
-        step_formset = self.StepFormSet(request.POST, request.FILES, queryset=Ingredient.objects.none(), prefix='steps')
+        step_formset = self.StepFormSet(request.POST, request.FILES, queryset=Step.objects.none(), prefix='steps')
         if form.is_valid() and ingredient_formset.is_valid() and step_formset.is_valid():
             self.object = form.save(commit=False)
             self.object.author = self.request.user
@@ -194,10 +157,41 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
             return self.form_invalid(form, ingredient_formset, step_formset)
 
 
-def test_page(request, slug):
-    p = get_object_or_404(Post, slug=slug)
-    like_count = len(p.likes.all())
-    return render(request, 'recipes/post_detail.html', {'likes': like_count})
+class PostEditView(LoginRequiredMixin, UpdateView):
+    login_url = reverse_lazy('account_login')
+    model = Post
+    template_name = 'recipes/update_post.html'
+    form_class = PostForm
+    IngredientFormSet = inlineformset_factory(Post, Ingredient, form=IngredientForm, extra=0, can_delete=True, can_order=False, min_num=1)
+    StepFormSet = inlineformset_factory(Post, Step, form=StepForm, extra=0, can_delete=True, can_order=False, min_num=1)
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form(self.form_class)
+        ingredient_formset = self.IngredientFormSet(prefix='ingredients', instance=self.object)
+        step_formset = self.StepFormSet(prefix='steps', instance=self.object)
+        return self.render_to_response(self.get_context_data(form=form, ingredient_formset=ingredient_formset, step_formset=step_formset))
+
+    def get_success_url(self):
+        return reverse_lazy('posts:posts_list')
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form(self.form_class)
+
+        if form.is_valid():
+            self.object = form.save(commit=False)
+            self.object.author = self.request.user
+            self.object.save()
+            ingredient_formset = self.IngredientFormSet(request.POST, prefix='ingredients', instance=self.object, queryset=Ingredient.objects.filter(post_id=self.object.id).all())
+            if ingredient_formset.is_valid():
+                ingredient_formset.instance = self.object
+                ingredient_formset.save()
+            else:
+                return self.render_to_response(self.get_context_data(ingredient_formset=ingredient_formset))
+            return redirect(self.get_success_url())
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
 
 
 @csrf_exempt

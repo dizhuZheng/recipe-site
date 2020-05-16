@@ -10,7 +10,7 @@ from recipes.models import Post
 
 @login_required
 def profile(request):
-    '''展示个人资料'''
+    '''show my profile'''
     user = request.user
     return render(request, 'users/profile.html', {'user':user})
 
@@ -23,7 +23,7 @@ def change_profile(request):
         form = ProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            messages.add_message(request, messages.SUCCESS, '个人信息更新成功！')
+            messages.add_message(request, messages.SUCCESS, 'Personal Info has been updated！')
             return redirect('users:profile')
     else:
         form = ProfileForm(instance=request.user)
