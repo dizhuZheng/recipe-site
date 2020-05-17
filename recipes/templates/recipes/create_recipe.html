@@ -19,7 +19,11 @@
     <label>{{ step_formset.prefix }}</label>
     {% for form in step_formset %}
     <div class="specific-step">
-      <p>{{ form.text }}</p>
+      <div style="display: flex;">
+        <div class="sort-down">Move down</div>
+        <div class="sort-asc">Move up</div>
+      </div>
+      <div>{{ form.text }}</div>
       <p>{{ form.pic }}</p>
       <img alt="Image Preview" width="250px" height="250px"/>
     </div>
@@ -41,13 +45,6 @@
     addCssClass: "add",
     added:"readURL",
   });
-  $('#move-up').click(function(){
-    var cur_li = $(this).parent();
-    var prev_li = cur_li.prev();
-        if(prev_li.length != 0){
-            prev_li.before(cur_li);
-            }
-    });
   count = 0;
   var loadFile = function(event) {
     var output = document.getElementsByTagName('img')[count];
@@ -57,13 +54,17 @@
     }
     count += 1;
   };
-  $('#move-up').click(function(){
-    var cur_li = $(this).parent();
-    var prev_li = cur_li.prev();
-        if(prev_li.length != 0){
-            prev_li.before(cur_li);
-            }
-    });
+  $(document).on('click', '.sort-down', function(){
+    if($(this).parents('.specific-step').nextAll().length > 0){
+      $(this).parents('.specific-step').next().after($(this).parents('.specific-step').prop('outerHTML'));
+      $(this).parents('.specific-step').remove();
+    }
+  }).on('click', '.sort-asc', function(){
+    if($(this).parents('.specific-step').prevAll().length > 0){
+      $(this).parents('.specific-step').prev().before($(this).parents('.specific-step').prop('outerHTML'));
+      $(this).parents('.specific-step').remove();
+    }
+  })
 </script>
 <style>
   .add{

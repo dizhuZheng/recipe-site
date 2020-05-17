@@ -21,7 +21,7 @@
     <div class="specific-step">
       <p>{{ form.text }}</p>
       <p>{{ form.pic }}</p>
-      <img alt="Image Preview" width="250px" height="250px"/>
+      <img src="{{ form.pic.url }}" alt="Image Preview" width="250px" height="250px"/>
     </div>
     {% endfor %}
   </div>
