@@ -169,7 +169,7 @@ class PostEditView(LoginRequiredMixin, UpdateView):
         self.object = self.get_object()
         form = self.get_form(self.form_class)
         ingredient_formset = self.IngredientFormSet(prefix='ingredients', instance=self.object)
-        step_formset = self.StepFormSet(prefix='steps', instance=self.object)
+        step_formset = self.StepFormSet(prefix='steps', instance=self.object)  #this is wrong
         return self.render_to_response(self.get_context_data(form=form, ingredient_formset=ingredient_formset, step_formset=step_formset))
 
     def get_success_url(self):

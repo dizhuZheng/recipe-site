@@ -8,11 +8,11 @@ from .forms import ProfileForm
 from recipes.models import Post
 
 
-@login_required
-def profile(request):
+def profile(request, username):
     '''show my profile'''
     user = request.user
-    return render(request, 'users/profile.html', {'user':user})
+    p = UserProfile.objects.get(username=username)
+    return render(request, 'users/profile.html', {'user':user, 'p': p})
 
 
 @csrf_protect
@@ -24,7 +24,7 @@ def change_profile(request):
         if form.is_valid():
             form.save()
             messages.add_message(request, messages.SUCCESS, 'Personal Info has been updated！')
-            return redirect('users:profile')
+            return redirect('users:profile', username=user.username)
     else:
         form = ProfileForm(instance=request.user)
     return render(request, 'users/change_profile.html', context={'form': form})

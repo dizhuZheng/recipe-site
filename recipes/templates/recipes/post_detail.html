@@ -1,12 +1,34 @@
 {% load static %}
 {% load ratings %}
 <div>
-  <p> Updated at:{{ post.updated_on }}</p>
   <h1>{{ post.title }}</h1>
-  <h3>Created by -- <a href="{% url 'users:profile' %}">{{ post.author }}</a></h3>
-  <br>
-  <h5>Categories: {{ post.categories }}</h5>
-  <h5>Cook Time: {{ post.cook_time }}{{ post.unit }}</h5>
+  <h3>Created by:  <img src="{{ post.author.photo.url }}" class="image-preview" width="25" height="25">
+    <a href="{% url 'users:profile' username=post.author.username %}" style="color: goldenrod;">{{ post.author }}</a>
+  </h3>
+  <p style="text-align: center; " class="sansserif"> Updated at: {{ post.updated_on|date:"D d M Y" }}</p>
+  <div class="profile-container">
+    {% if steps.last.pic %}
+      <img src="{{ steps.last.pic.url }}" width="250" height="250">
+    {% else %}
+      <img src="/media/images/noimage.jpg" width="200" height="200">
+    {% endif %}
+    <div>
+      <p class="sansserif">Categories: {{ post.categories }}</p>
+      <p class="sansserif">Cook Time: {{ post.cook_time }}{{ post.unit }}</p>
+      <button class="btn" id="like" value="Good Recipe"><i class="fas fa-thumbs-up"></i><span id="test1">({{ likes }})</span></button>
+      <br><br>
+      <div class="sansserif">{% ratings object %}</div>
+      <br>
+      {% if request.user.is_authenticated %}
+        {% ifequal request.user post.author %}
+        <a href="{% url 'recipes:delete_post' slug=post.slug %}" class="sansserif">Delete Post</a>&nbsp;&nbsp;
+        <a href="{% url 'recipes:update_post' slug=post.slug %}" class="sansserif">Update Post</a>
+        {% endifequal %}
+      {% else %}
+      <h4>Please <a href="{% url 'account_login' %}">Log in </a> first</h4>
+      {% endif %}
+    </div>
+  </div>
 <div>
   <h4>{{ ingredients.count }} ingredients</h4>
   {% for i in ingredients %}
@@ -22,37 +44,16 @@
 </div>
 <br>
 <h4>Steps:</h4>
-<br>
-<ol>
-  {% for step in steps %}
-    <li>
-      <div>{{ step.text }}</div>
-      <div>
-        {% if step.pic %}
-          <img src="{{ step.pic.url }}" class="img-responsive" style="width: 20%; float: left;" />
-        {% else %}
-          <img src="/media/images/noimage.jpg" class="img-responsive" style="width: 20%; float: left;" />
-        {% endif %}
-      </div>
-    </li>
-  {% endfor %}
-</ol>
-<div>
-  <input id="like" type="submit" value="Good Recipe">
-  <p id="test1">({{ likes }})</p>
-  <p id="test2"></p>
-  {% ratings object %}
-</div>
-<div>
-  {% if request.user.is_authenticated %}
-    {% ifequal request.user post.author %}
-    <a href="{% url 'recipes:delete_post' slug=post.slug %}">Delete Post</a>
-    <a href="{% url 'recipes:update_post' slug=post.slug %}">Update Post</a>
-    {% endifequal %}
-  {% else %}
-  <h4>Please <a href="{% url 'account_login' %}">Log in </a> first</h4>
-  {% endif %}
-</div>
+{% for step in steps %}
+  <div class="steps">
+    {% if step.pic %}
+      <img src="{{ step.pic.url }}" class="img-responsive" style="width: 20%; float: left;" />
+    {% else %}
+      <img src="/media/images/noimage.jpg" class="img-responsive" style="width: 20%; float: left;" />
+    {% endif %}
+    <div id="test">{{ step.text }}</div>
+  </div>
+{% endfor %}
 <div>
   {% ifnotequal request.user post.author %}
     {% if not save_status %}
@@ -66,11 +67,7 @@
 <div>
   {% for comment in comments.all %}
     <div>{{ comment.created_on }}</div>
-    {% if comment.author.photo %}
-      <img src="{{ comment.author.photo.url }}" class="image-preview" width="25" height="25">
-    {% else %}
-      <img src="{% static "images/default.png" %}" width="25" height="25">
-    {% endif %}
+    <img src="{{ comment.author.photo.url }}" class="image-preview" width="25" height="25">
     <strong>{{ comment.author }}</strong>
     <p>{{ comment.text|linebreaks }}</p>
     {% ifequal request.user comment.author %}
@@ -111,8 +108,9 @@ $(document).ready(function(){
           }
       })
   })
-})
+});
 </script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
   /* The container */
   .container {
@@ -180,4 +178,50 @@ $(document).ready(function(){
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
   }
-  </style>
+  .steps {
+    margin-left: 10px;
+    padding-bottom: 30px;
+  }
+  .steps img{
+    margin-left: 10px;
+    padding-top: 10px;
+    padding-right: 1000px;
+    float: left;
+  }
+  .text{
+    height: 200px;
+    width: 50%;
+    float:right;
+  }
+  .btn {
+  background-color: rgb(86, 104, 163);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  padding: 10px 13px;
+  font-size: 25px;
+  cursor: pointer;
+}
+h1, h3, h3{
+  text-align: center;
+}
+.sansserif {
+  font-family: Arial, Helvetica, sans-serif;
+}
+.profile-container > img{
+  display: block;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+.profile-container > div {
+  display: inline-block;
+  position: absolute;
+  right: 200px;
+  margin-top: -250px;
+  padding: 5px;
+  line-height: 15px;
+  font-size: 15px;
+  color:mediumspringgreen;
+}
+</style>

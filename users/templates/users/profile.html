@@ -19,25 +19,26 @@
     {% endfor %}
 </div>
 {% endif %}
-{% if user.photo %}
-    <img src="{{ user.photo.url }}" class="image-preview" width="250" height="250">
+{% if p.photo %}
+    <img src="{{ p.photo.url }}" class="image-preview" width="250" height="250">
 {% else %}
     <img src="{% static "images/default.jpg" %}" width="250" height="250">
 {% endif %}
-<a href="{% url 'users:my_saves' %}">My Favorites</a>
-<a href="{% url 'users:my_posts' %}">My posts</a>
+<a href="{% url 'users:my_saves' username=p.username %}">My Favorites</a>
+<a href="{% url 'users:my_posts' username=p.username %}">My posts</a>
 {% if user.is_authenticated %}
-  <p>Welcome, {{ user.username }}</p>
-  <a href="{% url 'users:change_profile' %}">Modify my profile</a>
-  <a href="{% url 'users:my_drafts' %}">My Drafts</a>
-  <a href="{% url 'account_logout' %}">Log out</a>
+  {% ifequal user p %}
+    <p>Welcome, {{ p.username }}</p>
+    <a href="{% url 'users:change_profile' username=p.username %}">Modify my profile</a>
+    <a href="{% url 'users:my_drafts' username=p.username %}">My Drafts</a>
+  {% endifequal %}
 {% endif %}
 <ul>
-    <li>Gender: {{ user.gender }}</li>
-    <li>Job: {{ user.job }}</li>
-    <li>Email: {{ user.email }}</li>
-    <li>Address: {{ user.address }}</li>
-    <li>Time Joined: {{ user.date_joined }}</li>
+    <li>Gender: {{ p.gender }}</li>
+    <li>Job: {{ p.job }}</li>
+    <li>Email: {{ p.email }}</li>
+    <li>Address: {{ p.address }}</li>
+    <li>Time Joined: {{ p.date_joined }}</li>
 </ul>
 
 </body>
