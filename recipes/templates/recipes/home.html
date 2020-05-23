@@ -3,6 +3,9 @@
 {% load bootstrap4 %}
 {% block content %}
 {% include 'recipes/nav.html' %}
+{% if request.user.is_authenticated %}
+<h1>Welcome, {{ request.user.username }}</h1>
+{% endif %}
 <div id="slidershow" class="carousel slide" data-ride="carousel" data-interval = 3000 data-pause = "hover" data-wrap="true"
   style="margin-top: -2rem; width: 70%; height: 70%; margin-left:auto; margin-right:auto;" style="display: block">
     <ol class="carousel-indicators">

@@ -15,6 +15,26 @@ def profile(request, username):
     return render(request, 'users/profile.html', {'user':user, 'p': p})
 
 
+def my_posts(request, username):
+    author = UserProfile.objects.get(username=username)
+    my_posts = Post.objects.filter(author=author, status=1)
+    return render(request, 'users/my_posts.html', {'my_posts': my_posts})
+
+
+@login_required
+def my_drafts(request, username):
+    user = request.user
+    my_drafts = Post.objects.filter(author=username, status=0)
+    return render(request, 'users/my_drafts.html', {'user':user, 'my_drafts': my_drafts})
+
+
+@login_required
+def my_saves(request, username):
+    user = UserProfile.objects.get(username=username)
+    my_saves = user.post_favo.all()
+    return render(request, 'users/my_saves.html', {'user':user, 'my_saves': my_saves})
+
+
 @csrf_protect
 @login_required
 def change_profile(request):
@@ -24,28 +44,7 @@ def change_profile(request):
         if form.is_valid():
             form.save()
             messages.add_message(request, messages.SUCCESS, 'Personal Info has been updated！')
-            return redirect('users:profile', username=user.username)
+            return redirect('users:profile', username=request.user.username)
     else:
         form = ProfileForm(instance=request.user)
     return render(request, 'users/change_profile.html', context={'form': form})
-
-
-@login_required
-def my_posts(request):
-    user = request.user
-    my_posts = Post.objects.filter(author=user, status=1)
-    return render(request, 'users/my_posts.html', {'user':user, 'my_posts': my_posts})
-
-
-@login_required
-def my_drafts(request):
-    user = request.user
-    my_drafts = Post.objects.filter(author=user, status=0)
-    return render(request, 'users/my_drafts.html', {'user':user, 'my_drafts': my_drafts})
-
-
-@login_required
-def my_saves(request):
-    user = request.user
-    my_saves = user.post_favo.all()
-    return render(request, 'users/my_saves.html', {'user':user, 'my_saves': my_saves})
