@@ -1,39 +1,52 @@
+from django_elasticsearch_dsl import Document, fields
+from django_elasticsearch_dsl.registries import registry
+from .models import Category, Post, Ingredient, Step
+from recipes.models import UserProfile
 from elasticsearch_dsl import analyzer
-# from django_elasticsearch_dsl import DocType, Index, fields
-# from .models import models as post_models
 
-# post_index = Index('posts')
-# post_index.settings(
-#     number_of_shards=1,
-#     number_of_replicas=0
-# )
+html_strip = analyzer(
+    'html_strip',
+    tokenizer="standard",
+    filter=["lowercase", "stop", "snowball"],
+    char_filter=["html_strip"]
+)
 
-# html_strip = analyzer(
-#     'html_strip',
-#     tokenizer = "standard",
-#     filter=['standard', 'lowercase', 'stop', 'snowball'],
-#     char_filter = ["html_strip"]
-# )
+@registry.register_document
+class PostDocument(Document):
+    author = fields.ObjectField(properties={
+        'username': fields.TextField(analyzer=html_strip),
+        'address': fields.TextField(),
+        'job': fields.TextField(),
+        'gender': fields.TextField()
+    })
+    post_ingredients = fields.NestedField(properties={
+        'name': fields.TextField(analyzer=html_strip),
+        'amount': fields.DoubleField(),
+        'unit': fields.TextField(),
+        'pk': fields.IntegerField(),
+    })
 
-# @post_index.doc_type
-# class PostDocument(DocType):
-#     id = fields.StringField(
-#         analyzer=html_strip,
-#         fields={
-#             'raw': fields.StringField(analyzer='keyword'),
-#         }
-#     )
-#     body = fields.TextField(
-#         analyzer=html_strip,
-#         fields={
-#             'raw': fields.StringField(analyzer='keyword'),
-#         }
-#     )
+    class Index:
+        name = 'posts'
+        settings = {'number_of_shards': 1,
+                    'number_of_replicas': 0}
+    class Django:
+        model = Post
+        fields = ['title', 'created_on', 'cook_time']
+        related_models = [UserProfile, Ingredient]
 
-#     author = fields.IntegerField(attr='author_id')
-#     created = fields.DateField()
-#     modified = fields.DateField()
-#     pub_date = fields.DateField()
+    def get_queryset(self):
+        """Not mandatory but to improve performance we can select related in one sql request"""
+        return super(PostDocument, self).get_queryset().select_related(
+            'author'
+        )
 
-#     class Meta:
-#         model = post_models.Post
+    def get_instances_from_related(self, related_instance):
+        """If related_models is set, define how to retrieve the Post instance(s) from the related model.
+        The related_models option should be used with caution because it can lead in the index
+        to the updating of a lot of items.
+        """
+        if isinstance(related_instance, UserProfile):
+            return related_instance.post_author.all()
+        elif isinstance(related_instance, Ingredient):
+            return related_instance.post
