@@ -15,8 +15,6 @@ class UserProfile(AbstractUser):
     job = models.CharField(max_length=200, verbose_name='Job', null=True, blank=True)
     email = models.EmailField(max_length=150, verbose_name='Email', null=True, blank=True, unique=True)
     address = models.CharField(max_length=200, verbose_name='Address', null=True, blank=True)
-    # is_active = models.BooleanField(default=True)
-    # is_admin = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'User Info'
@@ -38,6 +36,3 @@ class UserProfile(AbstractUser):
 
     def __str__(self):
         return self.username
-
-    # @property
-    # def is_staff(self):
