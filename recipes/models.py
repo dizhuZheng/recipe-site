@@ -86,6 +86,7 @@ class Post(BaseModel):
         (1, 'Publish')
     ]
     status = models.IntegerField(choices=STATUS, default=1)
+<<<<<<< HEAD
     cook_time = models.PositiveIntegerField(null=True, blank=True, validators=[MinValueValidator(0, message='must be greater than 0!')])
     UNIT_CHOICE = [
         ('s', 'seconds'),
@@ -93,6 +94,8 @@ class Post(BaseModel):
         ('h', 'hours')
     ]
     unit = models.CharField(max_length=5, choices=UNIT_CHOICE, null=True, blank=True, default='m')
+=======
+>>>>>>> dd5be99ff95b71a75e3fc36b9a53695f75800534
 
     class Meta:
         ordering = ["-created_on"]
@@ -126,6 +129,20 @@ class Comment(BaseModel):
     def __str__(self):
         # return self.text[:20] + "..."
         return 'Commented {} by {}'.format(self.text[:15], self.author)
+
+
+class CookTime(models.Model):
+    cook_time = models.PositiveIntegerField(null=True, blank=True, validators=[MinValueValidator(0, message='must be greater than 0!')])
+    UNIT_CHOICE = [
+        ('s', 'seconds'),
+        ('m', 'minutes'),
+        ('h', 'hours')
+    ]
+    unit = models.CharField(max_length=5, choices=UNIT_CHOICE, null=True, blank=True, default='m')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='cook_time')
+
+    def __str__(self):
+        return '{}--{}'.format(self.cook_time, self.unit)
 
 
 class Ingredient(models.Model):
