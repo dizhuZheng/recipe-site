@@ -1,35 +1,30 @@
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
-from .models import Category, Post, Ingredient, Step, CookTime
+from .models import Category, Post, Ingredient, Step
 from recipes.models import UserProfile
 from elasticsearch_dsl import analyzer
 
 html_strip = analyzer(
     'html_strip',
     tokenizer="standard",
-    filter=["standard", "lowercase", "stop", "snowball"],
+    filter=["lowercase", "stop", "snowball"],
     char_filter=["html_strip"]
 )
 
 @registry.register_document
-class CategorytDocument(Document):
-    class Index:
-        name = 'categories'
-        settings = {'number_of_shards': 1,
-                    'number_of_replicas': 0}
-    class Django:
-        model = Category
-        fields = ['name', 'slug']
-
-
-@registry.register_document
 class PostDocument(Document):
     author = fields.ObjectField(properties={
-            'username': fields.TextField(),
-            'address': fields.TextField(),
-            'job': fields.TextField(),
-            'gender': fields.TextField()
-        })
+        'username': fields.TextField(analyzer=html_strip),
+        'address': fields.TextField(),
+        'job': fields.TextField(),
+        'gender': fields.TextField()
+    })
+    post_ingredients = fields.NestedField(properties={
+        'name': fields.TextField(analyzer=html_strip),
+        'amount': fields.DoubleField(),
+        'unit': fields.TextField(),
+        'pk': fields.IntegerField(),
+    })
 
     class Index:
         name = 'posts'
@@ -37,8 +32,8 @@ class PostDocument(Document):
                     'number_of_replicas': 0}
     class Django:
         model = Post
-        fields = ['title', 'created_on']
-        related_models = [UserProfile]
+        fields = ['title', 'created_on', 'cook_time']
+        related_models = [UserProfile, Ingredient]
 
     def get_queryset(self):
         """Not mandatory but to improve performance we can select related in one sql request"""
@@ -52,8 +47,6 @@ class PostDocument(Document):
         to the updating of a lot of items.
         """
         if isinstance(related_instance, UserProfile):
-            return related_instance.post_set.all()
-        # elif isinstance(related_instance, Ingredient):
-        #     return related_instance.post
-        # elif isinstance(related_instance, CookTime):
-        #     return related_instance.post
+            return related_instance.post_author.all()
+        elif isinstance(related_instance, Ingredient):
+            return related_instance.post

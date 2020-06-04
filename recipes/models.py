@@ -86,6 +86,13 @@ class Post(BaseModel):
         (1, 'Publish')
     ]
     status = models.IntegerField(choices=STATUS, default=1)
+    cook_time = models.PositiveIntegerField(null=True, blank=True, validators=[MinValueValidator(0, message='must be greater than 0!')])
+    UNIT_CHOICE = [
+        ('s', 'seconds'),
+        ('m', 'minutes'),
+        ('h', 'hours')
+    ]
+    unit = models.CharField(max_length=5, choices=UNIT_CHOICE, null=True, blank=True, default='m')
 
     class Meta:
         ordering = ["-created_on"]
@@ -121,24 +128,10 @@ class Comment(BaseModel):
         return 'Commented {} by {}'.format(self.text[:15], self.author)
 
 
-class CookTime(models.Model):
-    cook_time = models.PositiveIntegerField(null=True, blank=True, validators=[MinValueValidator(0, message='must be greater than 0!')])
-    UNIT_CHOICE = [
-        ('s', 'seconds'),
-        ('m', 'minutes'),
-        ('h', 'hours')
-    ]
-    unit = models.CharField(max_length=5, choices=UNIT_CHOICE, null=True, blank=True, default='m')
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='cook_time')
-
-    def __str__(self):
-        return '{}--{}'.format(self.cook_time, self.unit)
-
-
 class Ingredient(models.Model):
     name = models.CharField(max_length=100)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_ingredients')
-    amount = models.DecimalField(max_digits=5, decimal_places=1, help_text="eg: 2g", validators=[MinValueValidator(0.01, message='must be greater than 0.01!')])
+    amount = models.DecimalField(max_digits=5, decimal_places=2, help_text="eg: 2g", validators=[MinValueValidator(0.01, message='must be greater than 0.01!')])
     UNIT_CHOICE = [
         ('g', 'gram'),
         ('mg', 'milligram'),

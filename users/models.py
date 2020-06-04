@@ -20,11 +20,6 @@ class UserProfile(AbstractUser):
         verbose_name = 'User Info'
         verbose_name_plural = verbose_name
         ordering = ['-id']
-        permissions = (
-            ('view_draft', 'can see the drafts'),
-            ('view_favorite', 'can see the author\'s favorite articles'),
-            ('view_save', 'can see the author\'s saves')
-        )
 
     def get_absolute_url(self):
         """returns the url to access a particular user access"""
