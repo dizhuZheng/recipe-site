@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import logout
 from django.contrib import messages
 from .models import UserProfile
+from django.http import HttpResponse
 from .forms import ProfileForm
 from recipes.models import Post
 
@@ -22,29 +23,28 @@ def my_posts(request, username):
 
 
 @login_required
-def my_drafts(request, username):
+def my_drafts(request):
     user = request.user
-    my_drafts = Post.objects.filter(author=username, status=0)
+    my_drafts = Post.objects.filter(author=user, status=0)
     return render(request, 'users/my_drafts.html', {'user':user, 'my_drafts': my_drafts})
-
-
-@login_required
-def my_saves(request, username):
-    user = UserProfile.objects.get(username=username)
-    my_saves = user.post_favo.all()
-    return render(request, 'users/my_saves.html', {'user':user, 'my_saves': my_saves})
 
 
 @csrf_protect
 @login_required
-def change_profile(request):
+def change_profile(request, username):
     '''更新个人资料'''
     if request.method == 'POST':
         form = ProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            messages.add_message(request, messages.SUCCESS, 'Personal Info has been updated！')
-            return redirect('users:profile', username=request.user.username)
+            messages.add_message(request, messages.SUCCESS, 'Personal Information has been updated！')
+            return redirect("users:profile", username=request.user.username)
     else:
         form = ProfileForm(instance=request.user)
-    return render(request, 'users/change_profile.html', context={'form': form})
+    return render(request, 'users/change_profile.html', context={'form': form, 'username': username})
+
+
+def my_saves(request, username):
+    user = UserProfile.objects.get(username=username)
+    my_saves = user.post_favo.all()
+    return render(request, 'users/my_saves.html', {'user':user, 'my_saves': my_saves})

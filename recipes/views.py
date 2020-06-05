@@ -14,6 +14,7 @@ from .fields import GroupedModelChoiceField
 from django.contrib import messages
 from django.http import JsonResponse
 import json
+from users.models import UserProfile
 
 
 class StepForm(ModelForm):
@@ -137,8 +138,7 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
         return render(request, self.template_name, {'form': form, 'ingredient_formset': ingredient_formset, 'step_formset': step_formset})
 
     def form_invalid(self, form, ingredient_formset, step_formset):
-        return self.render_to_response(self.get_context_data(form=form,
-                                  ingredient_formset=ingredient_formset, step_formset=step_formset))
+        return self.render_to_response(self.get_context_data(form=form,ingredient_formset=ingredient_formset, step_formset=step_formset))
 
     def post(self, request, *args, **kwargs):
         form = self.get_form(self.form_class)
@@ -146,7 +146,7 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
         step_formset = self.StepFormSet(request.POST, request.FILES, queryset=Step.objects.none(), prefix='steps')
         if form.is_valid() and ingredient_formset.is_valid() and step_formset.is_valid():
             self.object = form.save(commit=False)
-            self.object.author = self.request.user
+            self.object.author = UserProfile.objects.get(id=request.user.id)
             self.object.save()
             ingredient_formset.instance = self.object
             ingredient_formset.save()
