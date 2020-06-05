@@ -1,6 +1,6 @@
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
-from .models import Category, Post, Ingredient, Step
+from .models import Category, Post, Ingredient, Step, Comment
 from recipes.models import UserProfile
 from elasticsearch_dsl import analyzer
 
@@ -15,14 +15,19 @@ html_strip = analyzer(
 class PostDocument(Document):
     author = fields.ObjectField(properties={
         'username': fields.TextField(analyzer=html_strip),
-        'address': fields.TextField(),
-        'job': fields.TextField(),
-        'gender': fields.TextField()
     })
     post_ingredients = fields.NestedField(properties={
         'name': fields.TextField(analyzer=html_strip),
         'amount': fields.DoubleField(),
         'unit': fields.TextField(),
+        'pk': fields.IntegerField(),
+    })
+    post_steps = fields.NestedField(properties={
+        'text': fields.TextField(analyzer=html_strip, fields={'raw': fields.KeywordField()}),
+        'pk': fields.IntegerField(),
+    })
+    post_comments = fields.NestedField(properties={
+        'text': fields.TextField(analyzer=html_strip),
         'pk': fields.IntegerField(),
     })
 
@@ -33,7 +38,7 @@ class PostDocument(Document):
     class Django:
         model = Post
         fields = ['title', 'created_on', 'cook_time']
-        related_models = [UserProfile, Ingredient]
+        related_models = [UserProfile, Ingredient, Step, Comment]
 
     def get_queryset(self):
         """Not mandatory but to improve performance we can select related in one sql request"""
@@ -49,4 +54,8 @@ class PostDocument(Document):
         if isinstance(related_instance, UserProfile):
             return related_instance.post_author.all()
         elif isinstance(related_instance, Ingredient):
+            return related_instance.post
+        elif isinstance(related_instance, Step):
+            return related_instance.post
+        elif isinstance(related_instance, Comment):
             return related_instance.post
