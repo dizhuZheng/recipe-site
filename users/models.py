@@ -25,9 +25,5 @@ class UserProfile(AbstractUser):
         """returns the url to access a particular user access"""
         return reverse('users:profile', kwargs={'username': self.username})
 
-    def get_absolute_url(self):
-        """returns the url to access a particular user access"""
-        return reverse('users:profile', kwargs={'username': self.username})
-
     def __str__(self):
         return self.username

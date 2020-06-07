@@ -30,7 +30,7 @@
   {% ifequal user p %}
     <p>Welcome, {{ p.username }}</p>
     <a href="{% url 'users:change_profile' username=p.username %}">Modify my profile</a>
-    <a href="{% url 'users:my_drafts' username=p.username %}">My Drafts</a>
+    <a href="{% url 'users:my_drafts' %}">My Drafts</a>
   {% endifequal %}
 {% endif %}
 <ul>
