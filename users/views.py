@@ -7,6 +7,7 @@ from .models import UserProfile
 from django.http import HttpResponse
 from .forms import ProfileForm
 from recipes.models import Post
+from .es_call import esearch
 
 
 def profile(request, username):
@@ -48,3 +49,22 @@ def my_saves(request, username):
     user = UserProfile.objects.get(username=username)
     my_saves = user.post_favo.all()
     return render(request, 'users/my_saves.html', {'user':user, 'my_saves': my_saves})
+
+
+def search_index(request):
+    results = []
+    name_term = ""
+    gender_term = ""
+    if request.GET.get('username') and request.GET.get('gender'):
+        name_term = request.GET['username']
+        gender_term = request.GET['gender']
+    elif request.GET.get('username'):
+        name_term = request.GET['username']
+    elif request.GET.get('gender'):
+        gender_term = request.GET['gender']
+    search_term = name_term or gender_term
+    print("####test#####\n", search_term)
+    results = esearch(username=name_term, gender=gender_term)
+    print(results)
+    context = {'results': results, 'count': len(results), 'search_term': search_term }
+    return render(request, 'users/index.html', context)
