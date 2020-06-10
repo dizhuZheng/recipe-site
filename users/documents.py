@@ -16,7 +16,7 @@ class UserDocument(Document):
             'address',
             'job',
             'gender',
-            'date_joined',
+            'photo',
         ]
         # Ignore auto updating of Elasticsearch when a model is saved
         # or deleted:

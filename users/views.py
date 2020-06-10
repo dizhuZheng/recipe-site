@@ -53,18 +53,7 @@ def my_saves(request, username):
 
 def search_index(request):
     results = []
-    name_term = ""
-    gender_term = ""
-    if request.GET.get('username') and request.GET.get('gender'):
-        name_term = request.GET['username']
-        gender_term = request.GET['gender']
-    elif request.GET.get('username'):
-        name_term = request.GET['username']
-    elif request.GET.get('gender'):
-        gender_term = request.GET['gender']
-    search_term = name_term or gender_term
-    print("####test#####\n", search_term)
-    results = esearch(username=name_term, gender=gender_term)
-    print(results)
-    context = {'results': results, 'count': len(results), 'search_term': search_term }
+    query = request.GET.get('q')
+    results = esearch(username=query, gender=query, email=query, address=query)
+    context = {'results': results, 'count': len(results), 'search_term': query}
     return render(request, 'users/index.html', context)
