@@ -1,77 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <title>BooBoo Recipe</title>
     <meta charset="utf-8">
     <title>{% block title %}{% endblock %}BooBooRecipe</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <style>
-        img {
-          display: block;
-          margin-left: auto;
-        }
-        form{
-          width:50%;
-          height: 50%;
-          margin-left: 80px;
-          margin-top: 30px;
-        }
+      .navbar {
+      margin-bottom: 0;
+      border-radius: 0;
+    }
 
-        .fa {
-          padding: 20px;
-          font-size: 100px;
-          width: 55px;
-          text-align: center;
-          text-decoration: none;
-          margin: 0px 10px 10px 0;
-          border-radius: 150%;
-        }
+    /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+    .row.content {height: 450px}
 
-        .footer {
-          position: fixed;
-          left: 0;
-          bottom: 0;
-          color: white;
-          text-align: center;
-        }
+    /* Set gray background color and 100% height */
+    .sidenav {
+      padding-top: 20px;
+      background-color: #f1f1f1;
+      height: 100%;
+    }
 
-        .fa:hover {
-            opacity: 0.8;
-        }
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
 
-        .fa-facebook {
-          background: #3B5998;
-          color: white;
-        }
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height:auto;}
+    }
+    img {
+      display: block;
+      margin-left: auto;
+    }
+    form{
+      width:50%;
+      height: 50%;
+      margin-left: 80px;
+      margin-top: 30px;
+    }
 
-        .fa-twitter {
-          background: #55ACEE;
-          color: white;
-        }
-        .fa-snapchat-ghost {
-          background: #fffc00;
-          color: white;
-          text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
-        }
-        .fa-github{
-          background:purple;
-          color:white;
-        }
-    </style>
-  </head>
+    .fa {
+      padding: 20px;
+      font-size: 100px;
+      width: 55px;
+      text-align: center;
+      text-decoration: none;
+      margin: 0px 10px 10px 0;
+      border-radius: 150%;
+    }
+    .fa:hover {
+        opacity: 0.8;
+    }
+
+    .fa-facebook {
+      background: #3B5998;
+      color: white;
+    }
+
+    .fa-twitter {
+      background: #55ACEE;
+      color: white;
+    }
+    .fa-snapchat-ghost {
+      background: #fffc00;
+      color: white;
+      text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    }
+    .fa-github{
+      background:purple;
+      color:white;
+    }
+  </style>
+</head>
   <body>
-    {% block content %}{% endblock %}
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col footer" style="background-color:rgb(56, 56, 65);"><h1>Hello Topher</h1>
-          <h1>Hello Topher</h1>
-          <h1>Hello Topher</h1></div>
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#" style="color: #fffc00;">BooBoo Recipe</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#">Menu</a></li>
+            <li><a href="#">Categories</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container-fluid text-center">
+      <div class="row content">
+        <div class="col-sm-2 sidenav">
+          {% block content %}{% endblock content %}
+        </div>
+        <div class="col-sm-8 text-left">
+          {% block pics %}{% endblock %}
+        </div>
+        <div class="col-sm-2 sidenav">
+          <div class="well">
+            <p>ADS</p>
+          </div>
+          <div class="well">
+            <p>ADS</p>
+          </div>
+        </div>
       </div>
     </div>
+    <footer class="container-fluid text-center">
+      <p>Footer Text</p>
+    </footer>
     {% block css %}{% endblock %}
     {% block js %}{% endblock %}
   </body>

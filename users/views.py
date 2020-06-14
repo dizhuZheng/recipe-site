@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from .forms import ProfileForm
 from recipes.models import Post
 from .es_call import esearch
+import json
 
 
 def profile(request, username):

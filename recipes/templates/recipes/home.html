@@ -2,10 +2,11 @@
 {% load static %}
 {% load bootstrap4 %}
 {% block content %}
-{% include 'recipes/nav.html' %}
 {% if request.user.is_authenticated %}
 <h1>Welcome, {{ request.user.username }}</h1>
 {% endif %}
+{% endblock%}
+{% block pics %}
 <div id="slidershow" class="carousel slide" data-ride="carousel" data-interval = 3000 data-pause = "hover" data-wrap="true"
   style="margin-top: -2rem; width: 70%; height: 70%; margin-left:auto; margin-right:auto;" style="display: block">
     <ol class="carousel-indicators">
@@ -16,11 +17,11 @@
     </ol>
     <div class="carousel-inner">
         <div class="item active">
-          <img src="{% static 'recipes/fast-food.jpg' %}"/>
+          <img src="/media/images/recipes/1.jpg" %}"/>
         </div>
         {% for img in imgs %}
         <div class="item ">
-            <img src="../../static/recipes/{{img}} "/>
+            <img src="/media/images/recipes/{{img}} "/>
         </div>
         {% endfor %}
     </div>
