@@ -3,12 +3,12 @@
 {% load bootstrap4 %}
 {% block content %}
 {% if request.user.is_authenticated %}
-<h1>Welcome, {{ request.user.username }}</h1>
+  <h4 style="color:crimson">Welcome, {{ request.user.username }}</h4>
 {% endif %}
 {% endblock%}
 {% block pics %}
 <div id="slidershow" class="carousel slide" data-ride="carousel" data-interval = 3000 data-pause = "hover" data-wrap="true"
-  style="margin-top: -2rem; width: 70%; height: 70%; margin-left:auto; margin-right:auto;" style="display: block">
+  style="margin-top: 0rem; margin-bottom: 0rem; width: 100%; height: 100%; margin-left:auto; margin-right:auto;" style="display: block">
     <ol class="carousel-indicators">
       <li class="active" data-target="#slidershow" data-slide-to="0" ></li>
       <li data-target="#slidershow" data-slide-to="1"></li>
@@ -17,13 +17,17 @@
     </ol>
     <div class="carousel-inner">
         <div class="item active">
-          <img src="/media/images/recipes/1.jpg" %}"/>
+          <img src="/media/images/recipes/1.jpg">
         </div>
-        {% for img in imgs %}
-        <div class="item ">
-            <img src="/media/images/recipes/{{img}} "/>
+        <div class="item">
+          <img src="/media/images/recipes/2.jpg" alt="Chicago">
         </div>
-        {% endfor %}
+        <div class="item">
+          <img src="/media/images/recipes/3.jpg" alt="New Jersey">
+        </div>
+        <div class="item">
+          <img src="/media/images/recipes/4.jpg" alt="New York">
+        </div>
     </div>
     <a class="left carousel-control" href="#slidershow" role="button" data-slide="prev" >
     <span class="glyphicon glyphicon-chevron-left"></span>
