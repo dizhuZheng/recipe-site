@@ -48,12 +48,10 @@ class IngredientForm(ModelForm):
 class PostListView(ListView):
     model = Post
     context_object_name = 'post_list'
+    queryset = Post.objects.filter(status=1)
     template_name = 'recipes/post_list.html'
-    paginate_by = 15
+    paginate_by = 8
     ordering = ['-created_on']
-
-    def get_queryset(self):
-        return Post.objects.filter(status=1)
 
 
 class PostDetailView(DetailView):
