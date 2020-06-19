@@ -8,7 +8,7 @@ class UserProfile(AbstractUser):
         ('male', 'Male'),
         ('female', 'Female')
     )
-    photo = models.ImageField(upload_to='images/', null=True, blank=True)
+    photo = models.ImageField(upload_to='images/', null=True, blank=True, default='media/images/default.png')
     username = models.CharField(max_length=200, verbose_name='Username', null=False, blank=False, unique=True)
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default='Male')
     date_joined = models.DateTimeField(default=timezone.now)

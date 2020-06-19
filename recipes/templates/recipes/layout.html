@@ -125,7 +125,11 @@
               <li class="collapse navbar-collapse" id="mainMenu">
                 <ul class="navbar-nav ml-auto">
                   <li class="nav-item dropdown">
-                    <img src="{{ user.photo.url }}" class="image-preview" width="25" height="25" style="float: left;">
+                    {% if user.photo %}
+                      <img src="{{ user.photo.url }}" class="image-preview" width="25" height="25" style="float: left;">
+                    {% else %}
+                      <img src="media/images/default.png" class="image-preview" width="25" height="25" style="float: left;">
+                    {% endif %}
                     <a class="nav-link dropdown-toggle" href="/accounts/profile/" id="userMenu" data-toggle="dropdown"
                       aria-haspopup="true" aria-expanded="false">
                     {{ user.username }}

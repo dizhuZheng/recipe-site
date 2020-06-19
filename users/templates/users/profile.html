@@ -6,15 +6,11 @@
     <title>个人资料</title>
 </head>
 <body>
-
 {% if messages %}
 <div class="container">
     {% for message in messages %}
-    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-secondary{% endif %} alert-dismissible rounded-0 fade show" role="alert">
-        {{ message }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+    <div class="alert alert-success">
+        <strong>Success!</strong>{{ message }}
     </div>
     {% endfor %}
 </div>
@@ -22,7 +18,7 @@
 {% if p.photo %}
     <img src="{{ p.photo.url }}" class="image-preview" width="250" height="250">
 {% else %}
-    <img src="{% static "images/default.jpg" %}" width="250" height="250">
+    <img src="/media/images/default.png">
 {% endif %}
 <a href="{% url 'users:my_saves' username=p.username %}">My Favorites</a>
 <a href="{% url 'users:my_posts' username=p.username %}">My posts</a>
