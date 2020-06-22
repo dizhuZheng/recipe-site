@@ -1,95 +1,89 @@
 {% load static %}
 {% load ratings %}
-<div>
-  <h1>{{ post.title }}</h1>
-  <h3>Created by:  <img src="{{ post.author.photo.url }}" class="image-preview" width="25" height="25">
-    <a href="{% url 'users:profile' username=post.author.username %}" style="color: goldenrod;">{{ post.author }}</a>
-  </h3>
-  <p style="text-align:center; " class="sansserif"> Updated at: {{ post.updated_on|date:"D d M Y" }}</p>
-  <div class="profile-container">
-    {% if steps.last.pic %}
-      <img src="{{ steps.last.pic.url }}" width="250" height="250">
-    {% else %}
-      <img src="/media/images/noimage.jpg" width="200" height="200">
-    {% endif %}
-    <div>
-      <p class="sansserif">Categories: {{ post.categories }}</p>
-      <p class="sansserif">Cook Time: {{ post.cook_time }}{{ post.unit }}</p>
-      <button class="btn" id="like" value="Good Recipe"><i class="fas fa-thumbs-up"></i><span id="test1">({{ likes }})</span></button>
-      <br><br>
-      <div class="sansserif">{% ratings object %}</div>
-      <br>
-      {% if request.user.is_authenticated %}
-        {% ifequal request.user post.author %}
-        <a href="{% url 'recipes:delete_post' slug=post.slug %}" class="sansserif">Delete Post</a>&nbsp;&nbsp;
-        <a href="{% url 'recipes:update_post' slug=post.slug %}" class="sansserif">Update Post</a>
-        {% endifequal %}
+<html>
+  <div>
+    <h1>{{ post.title }}</h1>
+    <h3>Created by:  <img src="{{ post.author.photo.url }}" class="image-preview" width="25" height="25">
+      <a href="{% url 'users:profile' username=post.author.username %}" style="color: goldenrod;">{{ post.author }}</a>
+    </h3>
+    <p style="text-align:center; " class="sansserif"> Updated at: {{ post.updated_on|date:"D d M Y" }}</p>
+    <div class="profile-container">
+      {% if steps.last.pic %}
+        <img src="{{ steps.last.pic.url }}" width="250" height="250">
       {% else %}
-      <h4>Please <a href="{% url 'account_login' %}">Log in </a> first</h4>
+        <img src="/media/images/noimage.jpg" width="200" height="200">
       {% endif %}
-    </div>
-  </div>
-<div>
-  <h4>{{ ingredients.count }} ingredients</h4>
-  {% for i in ingredients %}
-  <label class="container">
-    {{ i.name }}--{{ i.amount}}
-    {% if i.unit %}
-      {{ i.unit }}
-    {% endif %}
-    <input type="checkbox">
-    <span class="checkmark"></span>
-  </label>
-  {% endfor %}
-</div>
-<br>
-<h4>Steps:</h4>
-{% for step in steps %}
-  <div class="steps">
-    {% if step.pic %}
-      <img src="{{ step.pic.url }}" class="img-responsive" style="width: 20%; float: left;" />
-    {% else %}
-      <img src="/media/images/noimage.jpg" class="img-responsive" style="width: 20%; float: left;" />
-    {% endif %}
-    <div id="test">{{ step.text }}</div>
-  </div>
-{% endfor %}
-<div>
-  {% ifnotequal request.user post.author %}
-    {% if not save_status %}
-    <form method="POST" action="{% url 'recipes:post_favorite' slug=post.slug %}">
-      <input type="hidden" name="supporttype" />
-      <input type="submit" value="Save to favorites" name='like'/>
-    </form>
-    {% endif %}
-  {% endifnotequal %}
-</div>
-<div>
-  {% for comment in comments.all %}
-    <div>{{ comment.created_on }}</div>
-    <img src="{{ comment.author.photo.url }}" class="image-preview" width="25" height="25">
-    <strong>{{ comment.author }}</strong>
-    <p>{{ comment.text|linebreaks }}</p>
-    {% ifequal request.user comment.author %}
-      <a href="{% url 'recipes:delete_comment' slug=post.slug pk=comment.id %}">Delete comment</a>
-    {% endifequal %}
-  {% empty %}
-      <p>No comments here yet :-(</p>
-  {% endfor %}
-  <a href="{% url 'recipes:add_comment' slug=post.slug %}">Add comment</a>
-  {% if messages %}
-  <div class="container">
-      {% for message in messages %}
-      <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-secondary{% endif %} alert-dismissible rounded-0 fade show" role="alert">
-          {{ message }}
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-          </button>
+      <div>
+        <p class="sansserif">Categories: {{ post.categories }}</p>
+        <p class="sansserif">Cook Time: {{ post.cook_time }}{{ post.unit }}</p>
+        <button class="btn" id="like" value="Good Recipe"><i class="fas fa-thumbs-up"></i><span id="test1">({{ likes }})</span></button>
+        <br><br>
+        <h3>Difficulty level:</h3>
+        <div class="sansserif">{% ratings object %}</div>
       </div>
-      {% endfor %}
+    </div>
+  <div>
+    <h4>{{ ingredients.count }} ingredients</h4>
+    {% for i in ingredients %}
+    <label class="container">
+      {{ i.name }}--{{ i.amount}}
+      {% if i.unit %}
+        {{ i.unit }}
+      {% endif %}
+      <input type="checkbox">
+      <span class="checkmark"></span>
+    </label>
+    {% endfor %}
   </div>
-{% endif %}
-</div>
+  <br>
+  <h4>Steps:</h4>
+  {% for step in steps %}
+    <div class="steps">
+      {% if step.pic %}
+        <img src="{{ step.pic.url }}" class="img-responsive" style="width: 20%; float: left;" />
+      {% else %}
+        <img src="/media/images/noimage.jpg" class="img-responsive" style="width: 20%; float: left;" />
+      {% endif %}
+      <div id="test">{{ step.text }}</div>
+    </div>
+  {% endfor %}
+  <div>
+    {% ifnotequal request.user post.author %}
+      {% if not save_status %}
+      <form method="POST" action="{% url 'recipes:post_favorite' slug=post.slug %}">
+        <input type="hidden" name="supporttype" />
+        <input type="submit" value="Save to favorites" name='like'/>
+      </form>
+      {% endif %}
+    {% endifnotequal %}
+  </div>
+  <div>
+    {% for comment in comments.all %}
+      <div>{{ comment.created_on }}</div>
+      <img src="{{ comment.author.photo.url }}" class="image-preview" width="25" height="25">
+      <strong>{{ comment.author }}</strong>
+      <p>{{ comment.text|linebreaks }}</p>
+      {% ifequal request.user comment.author %}
+        <a href="{% url 'recipes:delete_comment' slug=post.slug pk=comment.id %}">Delete comment</a>
+      {% endifequal %}
+    {% empty %}
+        <p>No comments here yet :-(</p>
+    {% endfor %}
+    <a href="{% url 'recipes:add_comment' slug=post.slug %}">Add comment</a>
+    {% if messages %}
+    <div class="container">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-secondary{% endif %} alert-dismissible rounded-0 fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+  {% endif %}
+  </div>
+</html>
 <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
 <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
 <script src='https://kit.fontawesome.com/a076d05399.js'></script>

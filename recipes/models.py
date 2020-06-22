@@ -9,6 +9,9 @@ from  django.core.validators import MinValueValidator
 from .unique_slug import unique_slugify
 from django.contrib.contenttypes.fields import GenericRelation
 from star_ratings.models import Rating
+from imagekit.models import ProcessedImageField
+from imagekit.processors import ResizeToFill
+
 
 class BaseModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, verbose_name='Created Time')
@@ -155,7 +158,7 @@ class Ingredient(models.Model):
 
 class Step(models.Model):
     text = models.TextField(max_length=500, null=False, blank=False)
-    pic = models.ImageField(upload_to='images/', null=True, blank=True)
+    pic = ProcessedImageField(upload_to='images/', null=True, blank=True, processors=[ResizeToFill(100, 50)],format='JPEG', options={'quality': 60})
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_steps')
 
     def __str__(self):

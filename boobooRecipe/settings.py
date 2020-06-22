@@ -52,11 +52,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_elasticsearch_dsl',
     'django_elasticsearch_dsl_drf',
+    'imagekit'
 ]
 
 # 当出现 "SocialApp matching query does not exist" 这种报错的时候就需要更换这个ID
 SITE_ID = 1
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+STAR_RATINGS_RERATE = False
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -70,6 +72,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'boobooRecipe.urls'
 
+TEMPLATE_CONTEXT_PROCESSORS = {
+    'django.core.context_processors.request',
+}
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',

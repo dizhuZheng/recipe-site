@@ -1,20 +1,30 @@
+{% load imagekit %}
+{% load static %}
+{% load ratings %}
 <!DOCTYPE html>
 <html>
-<title>W3.CSS Template</title>
+<title>Recipe List</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Karma">
+<link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
+<script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
 <style>
   body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
   .w3-bar-block .w3-bar-item {padding:20px}
+  footer {
+    background-color: black;
+    color: white;
+    bottom: 0;
+  }
 </style>
 {% load static %}
 <body>
   <nav class="w3-sidebar w3-bar-block w3-card w3-top w3-xlarge w3-animate-left" style="display:none;z-index:2;width:40%;min-width:300px" id="mySidebar">
     <a href="javascript:void(0)" onclick="w3_close()"
     class="w3-bar-item w3-button">Close Menu</a>
-    <a href="#food" onclick="w3_close()" class="w3-bar-item w3-button">Food</a>
+    <a href="{% url 'home' %}" onclick="w3_close()" class="w3-bar-item w3-button">Home</a>
     <a href="#about" onclick="w3_close()" class="w3-bar-item w3-button">About</a>
   </nav>
   <div class="w3-top">
@@ -30,30 +40,31 @@
       {% for post in post_list|slice:":4" %}
         <div class="w3-quarter">
           {% if post.post_steps.last.pic %}
-            <img src="{{ post.post_steps.last.pic.url }}" alt="{{ post.title }}" style="width:100%">
+            <img src="{{ post.post_steps.last.pic.url }}" alt="{{ post.title }}" style="width:100%;height:30%">
           {% elif post.post_steps.first.pic%}
-            <img src="{{ post.post_steps.first.pic.url }}" alt="{{ post.title }}" style="width:100%">
+            <img src="{{ post.post_steps.first.pic.url }}" alt="{{ post.title }}" style="width:100%;height:30%">
           {% else %}
-            <img src="/media/images/noimage.jpg" alt="{{ post.title }}" style="width:100%;">
+            <img src="/media/images/noimage.jpg" alt="{{ post.title }}" style="width:100%;height:30%">
           {% endif %}
           <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
           <p><strong>Author:</strong><a href="{% url 'users:profile' username=post.author.username %}">{{ post.author }}</a></p>
-          <p>{{ post.post_steps.first.text }}</p>
+          <p>Likes: {{ post.likes.count }}</p>
         </div>
       {% endfor %}
+    </div>
     <div class="w3-row-padding w3-padding-16 w3-center">
       {% for post in post_list|slice:"4:8" %}
         <div class="w3-quarter">
           {% if post.post_steps.last.pic %}
-            <img src="{{ post.post_steps.last.pic.url }}" alt="{{ post.title }}" style="width:100%">
+            {% thumbnail '100x50' source_file %}
           {% elif post.post_steps.first.pic%}
-            <img src="{{ post.post_steps.first.pic.url }}" alt="{{ post.title }}" style="width:100%">
+            {% thumbnail '100x50' source_file %}
           {% else %}
-            <img src="/media/images/noimage.jpg" alt="{{ post.title }}" style="width:100%;">
+            <img src="/media/images/noimage.jpg" alt="{{ post.title }}" style="width:100%;;height:30%">
           {% endif %}
           <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
           <p><strong>Author:</strong><a href="{% url 'users:profile' username=post.author.username %}">{{ post.author }}</a></p>
-          <p>{{ post.post_steps.first.text }}</p>
+          <p>Likes: {{ post.likes.count }}</p>
         </div>
       {% endfor %}
     </div>
@@ -61,13 +72,71 @@
   {% else %}
     <p>No topics have been added yet.</p>
   {% endif %}
-  <div class="w3-center w3-padding-32">
-    <div class="w3-bar">
-      <a href="#" class="w3-bar-item w3-button w3-hover-black">«</a>
-      <a href="#" class="w3-bar-item w3-black w3-button">1</a>
-      <a href="#" class="w3-bar-item w3-button w3-hover-black">2</a>
-      <a href="#" class="w3-bar-item w3-button w3-hover-black">3</a>
-      <a href="#" class="w3-bar-item w3-button w3-hover-black">4</a>
-      <a href="#" class="w3-bar-item w3-button w3-hover-black">»</a>
+  {% if is_paginated %}
+    <div class="w3-center w3-padding-32">
+      <div class="w3-bar">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="w3-bar-item w3-button w3-hover-black">&laquo;</a>
+        {% else %}
+          <a class="w3-bar-item w3-button w3-hover-black">&laquo;</a>
+        {% endif %}
+        {% for i in paginator.page_range %}
+          {% if page_obj.number == i %}
+            <a href="#" class="w3-bar-item w3-black w3-button">{{ i }}</a>
+          {% else %}
+            <a href="?page={{ i }}" class="w3-bar-item w3-button w3-hover-black">{{ i }}</a>
+          {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="w3-bar-item w3-button w3-hover-black">&raquo;</a>
+        {% else %}
+          <a href="#" class="w3-bar-item w3-button">&raquo;</a>
+        {% endif %}
+      </div>
     </div>
-  </div>
+  {% endif %}
+  <footer class="w3-row-padding w3-padding-32">
+    <div class="w3-third">
+      <h3>BooBoo Recipe</h3>
+      <p>Me gusta mucho la limonada.</p>
+      <p>Las uvas son deliciosas.</p>
+      <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">dizhu</a></p>
+    </div>
+    <div class="w3-third">
+      <h3>BLOG POSTS</h3>
+      <ul class="w3-ul w3-hoverable">
+        <li class="w3-padding-16">
+          <span class="w3-large">Lorem</span><br>
+          <span>Sed mattis nunc</span>
+        </li>
+        <li class="w3-padding-16">
+          <span class="w3-large">Ipsum</span><br>
+          <span>Praes tinci sed</span>
+        </li>
+      </ul>
+    </div>
+    <div class="w3-third w3-serif">
+      <h3>POPULAR TAGS</h3>
+      <p>
+        <span class="w3-tag w3-black w3-margin-bottom">Travel</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">New York</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Dinner</span>
+        <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Salmon</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">France</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Drinks</span>
+        <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Ideas</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Flavors</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Cuisine</span>
+        <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Chicken</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Dressing</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Fried</span>
+        <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Fish</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Duck</span>
+      </p>
+    </div>
+  </footer>
+</div>
+<script>
+// Script to open and close sidebar
+function w3_open() {
+  document.getElementById("mySidebar").style.display = "block";
+}
+
+function w3_close() {
+  document.getElementById("mySidebar").style.display = "none";
+}
+</script>
+
+</body>
+</html>
