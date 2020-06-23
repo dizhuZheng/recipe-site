@@ -69,7 +69,7 @@
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
             <li><a href="#">Popular Dishes</a></li>
-            <li><a href="#">Categories</a></li>
+            <li><a href="{% url 'posts:categories' %}">Categories</a></li>
             <li><a href="#">Contact</a></li>
           </ul>
           <form class="navbar-form navbar-left" action="/action_page.php">
@@ -135,6 +135,9 @@
           </div>
           <div class="well">
             <p>ADS</p>
+          </div>
+          <div>
+            <p>{% block add %}{% endblock %}</p>
           </div>
         </div>
       </div>

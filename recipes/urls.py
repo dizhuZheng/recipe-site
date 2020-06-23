@@ -6,7 +6,7 @@ from .views import PostDetailView, PostListView, CommentCreateView, CommentDelet
 app_name = 'posts'
 
 urlpatterns = [
-    path('', TemplateView.as_view(template_name="recipes/templates/recipes/recipes_home.html"), name='recipes_home'),
+    path('category/', TemplateView.as_view(template_name='recipes/categories.html'), name='categories'),
     path('posts/', PostListView.as_view(), name='posts_list'),
     path('create/', CreateRecipeView.as_view(), name='create'),
     path('posts/<slug:slug>/', PostDetailView.as_view(), name='post_detail'),

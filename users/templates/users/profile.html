@@ -13,7 +13,8 @@
     {% endfor %}
   </div>
 {% endif %}
-<div class="container" style="text-align: center; margin-top: 5%;">
+<h2 style="text-align: center; margin-top: 4%px;">My profile</h2>
+<div class="container" style="text-align: center; margin-top: 4%;">
   {% if p.photo %}
       <img src="{{ p.photo.url }}" class="image-preview" width="250" height="250">
   {% else %}
@@ -29,9 +30,11 @@
   {% endif %}
   <h3>Navigation:</h3>
   <div>
-    <li><a href="{% url 'users:my_saves' username=p.username %}">My Favorites</a></li>
-    <li><a href="{% url 'users:my_posts' username=p.username %}">My posts</a></li>
-    <li><a href="{% url 'home' %}">Home Page</a></li>
+    <a href="{% url 'users:my_saves' username=p.username %}">My Favorites</a>
+    &nbsp;&nbsp;
+    <a href="{% url 'users:my_posts' username=p.username %}">My posts</a>
+    &nbsp;&nbsp;
+    <a href="{% url 'home' %}">Home Page</a>
   </div>
   <h3>Basic Information:</h3>
   <div>
