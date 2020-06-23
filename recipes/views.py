@@ -136,6 +136,7 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
         return render(request, self.template_name, {'form': form, 'ingredient_formset': ingredient_formset, 'step_formset': step_formset})
 
     def form_invalid(self, form, ingredient_formset, step_formset):
+        messages.error(self.request,'Error happened !!!')
         return self.render_to_response(self.get_context_data(form=form,ingredient_formset=ingredient_formset, step_formset=step_formset))
 
     def post(self, request, *args, **kwargs):
@@ -143,6 +144,7 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
         ingredient_formset = self.IngredientFormSet(request.POST, queryset=Ingredient.objects.none(), prefix='ingredients')
         step_formset = self.StepFormSet(request.POST, request.FILES, queryset=Step.objects.none(), prefix='steps')
         if form.is_valid() and ingredient_formset.is_valid() and step_formset.is_valid():
+            messages.success(self.request, 'Recipe has been posted!')
             self.object = form.save(commit=False)
             self.object.author = UserProfile.objects.get(id=request.user.id)
             self.object.save()
@@ -150,7 +152,6 @@ class CreateRecipeView(LoginRequiredMixin, CreateView):
             ingredient_formset.save()
             step_formset.instance = self.object
             step_formset.save()
-            messages.success(self.request, 'Recipe has been posted!')
             return redirect(self.get_success_url())
         else:
             return self.form_invalid(form, ingredient_formset, step_formset)

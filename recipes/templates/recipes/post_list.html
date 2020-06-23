@@ -1,26 +1,19 @@
+{% extends 'recipes/base.html' %}
 {% load imagekit %}
 {% load static %}
-{% load ratings %}
-<!DOCTYPE html>
-<html>
-<title>Recipe List</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Karma">
-<link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
-<script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
-<style>
-  body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
-  .w3-bar-block .w3-bar-item {padding:20px}
-  footer {
-    background-color: black;
-    color: white;
-    bottom: 0;
-  }
-</style>
-{% load static %}
-<body>
+{% block content %}
+{% if messages %}
+  <div class="container">
+    {% for message in messages %}
+    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-secondary{% endif %} alert-dismissible rounded-0 fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+  </div>
+{% endif %}
   <nav class="w3-sidebar w3-bar-block w3-card w3-top w3-xlarge w3-animate-left" style="display:none;z-index:2;width:40%;min-width:300px" id="mySidebar">
     <a href="javascript:void(0)" onclick="w3_close()"
     class="w3-bar-item w3-button">Close Menu</a>
@@ -132,11 +125,8 @@
 function w3_open() {
   document.getElementById("mySidebar").style.display = "block";
 }
-
 function w3_close() {
   document.getElementById("mySidebar").style.display = "none";
 }
 </script>
-
-</body>
-</html>
+{% endblock content %}

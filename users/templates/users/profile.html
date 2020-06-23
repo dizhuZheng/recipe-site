@@ -1,46 +1,51 @@
-<!DOCTYPE html>
+{% extends 'recipes/base.html' %}
 {% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>个人资料</title>
-</head>
-<body>
+{% block content %}
 {% if messages %}
-<div class="container">
+  <div class="container">
     {% for message in messages %}
-    <div class="alert alert-success">
-        <strong>Success!</strong>{{ message }}
+    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-secondary{% endif %} alert-dismissible rounded-0 fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
     {% endfor %}
-</div>
+  </div>
 {% endif %}
-{% if p.photo %}
-    <img src="{{ p.photo.url }}" class="image-preview" width="250" height="250">
-{% else %}
-    <img src="/media/images/default.png">
-{% endif %}
-{% if user.is_authenticated %}
-  {% ifequal user p %}
-    <p>Welcome, {{ p.username }}</p>
-    <a href="{% url 'users:change_profile' username=p.username %}">Modify my profile</a>
-    &nbsp;&nbsp;
-    <a href="{% url 'users:my_drafts' %}">My Drafts</a>
-  {% endifequal %}
-{% endif %}
-<h3>Navigation:</h3>
-<div>
-  <li><a href="{% url 'users:my_saves' username=p.username %}">My Favorites</a></li>
-  <li><a href="{% url 'users:my_posts' username=p.username %}">My posts</a></li>
-  <li><a href="{% url 'home' %}">Home Page</a></li>
+<div class="container" style="text-align: center; margin-top: 5%;">
+  {% if p.photo %}
+      <img src="{{ p.photo.url }}" class="image-preview" width="250" height="250">
+  {% else %}
+      <img src="/media/images/default.png">
+  {% endif %}
+  {% if user.is_authenticated %}
+    {% ifequal user p %}
+      <h3>Welcome, {{ p.username }} !!!</h3>
+      <a href="{% url 'users:change_profile' username=p.username %}">Modify my profile</a>
+      &nbsp;&nbsp;
+      <a href="{% url 'users:my_drafts' %}">My Drafts</a>
+    {% endifequal %}
+  {% endif %}
+  <h3>Navigation:</h3>
+  <div>
+    <li><a href="{% url 'users:my_saves' username=p.username %}">My Favorites</a></li>
+    <li><a href="{% url 'users:my_posts' username=p.username %}">My posts</a></li>
+    <li><a href="{% url 'home' %}">Home Page</a></li>
+  </div>
+  <h3>Basic Information:</h3>
+  <div>
+    <li>Gender: {{ p.gender }}</li>
+    <li>Job: {{ p.job }}</li>
+    <li>Email: {{ p.email }}</li>
+    <li>Address: {{ p.address }}</li>
+    <li>Time Joined: {{ p.date_joined }}</li>
+  </div>
 </div>
-<h3>Basic Information:</h3>
-<div>
-  <li>Gender: {{ p.gender }}</li>
-  <li>Job: {{ p.job }}</li>
-  <li>Email: {{ p.email }}</li>
-  <li>Address: {{ p.address }}</li>
-  <li>Time Joined: {{ p.date_joined }}</li>
-</div>
-</body>
-</html>
+<style>
+  h3{
+    color:blueviolet;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  }
+</style>
+{% endblock content %}
