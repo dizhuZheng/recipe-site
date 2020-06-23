@@ -134,7 +134,7 @@ class Comment(BaseModel):
 class Ingredient(models.Model):
     name = models.CharField(max_length=100)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_ingredients')
-    amount = models.DecimalField(max_digits=5, decimal_places=2, help_text="eg: 2g", validators=[MinValueValidator(0.01, message='must be greater than 0.01!')])
+    amount = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0.01, message='must be greater than 0.01!')])
     UNIT_CHOICE = [
         ('g', 'gram'),
         ('mg', 'milligram'),

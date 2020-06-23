@@ -4,6 +4,12 @@
 {% block content %}
 {% if request.user.is_authenticated %}
   <h4 style="color:crimson">Welcome, {{ request.user.username }}</h4>
+  <div>
+    <p>Click here to create a new recipe:</p>
+    <p><a href="{% url 'posts:create' %}">
+    <img src="/media/images/add--v2.png" alt="Click icon" style="width:50%;height:50%;"></a>
+    </p>
+  </div>
 {% endif %}
 {% endblock%}
 {% block pics %}

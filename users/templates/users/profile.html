@@ -20,22 +20,27 @@
 {% else %}
     <img src="/media/images/default.png">
 {% endif %}
-<a href="{% url 'users:my_saves' username=p.username %}">My Favorites</a>
-<a href="{% url 'users:my_posts' username=p.username %}">My posts</a>
 {% if user.is_authenticated %}
   {% ifequal user p %}
     <p>Welcome, {{ p.username }}</p>
     <a href="{% url 'users:change_profile' username=p.username %}">Modify my profile</a>
+    &nbsp;&nbsp;
     <a href="{% url 'users:my_drafts' %}">My Drafts</a>
   {% endifequal %}
 {% endif %}
-<ul>
-    <li>Gender: {{ p.gender }}</li>
-    <li>Job: {{ p.job }}</li>
-    <li>Email: {{ p.email }}</li>
-    <li>Address: {{ p.address }}</li>
-    <li>Time Joined: {{ p.date_joined }}</li>
-</ul>
-
+<h3>Navigation:</h3>
+<div>
+  <li><a href="{% url 'users:my_saves' username=p.username %}">My Favorites</a></li>
+  <li><a href="{% url 'users:my_posts' username=p.username %}">My posts</a></li>
+  <li><a href="{% url 'home' %}">Home Page</a></li>
+</div>
+<h3>Basic Information:</h3>
+<div>
+  <li>Gender: {{ p.gender }}</li>
+  <li>Job: {{ p.job }}</li>
+  <li>Email: {{ p.email }}</li>
+  <li>Address: {{ p.address }}</li>
+  <li>Time Joined: {{ p.date_joined }}</li>
+</div>
 </body>
 </html>

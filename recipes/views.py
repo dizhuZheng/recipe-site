@@ -35,7 +35,6 @@ class PostForm(ModelForm):
         exclude = ['slug', 'author', 'favorites']
 
 
-
 class IngredientForm(ModelForm):
     class Meta:
         model = Ingredient
