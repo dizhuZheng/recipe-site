@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from .models import Post, Comment, Ingredient, Step, LikeCount, Foo, Category
+from .models import Post, Comment, Ingredient, Step, LikeCount, Foo
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
@@ -52,13 +52,6 @@ class PostListView(ListView):
     template_name = 'recipes/post_list.html'
     paginate_by = 8
     ordering = ['-created_on']
-
-
-class CategoryListView(ListView):
-    model = Category
-    context_object_name = 'category_list'
-    queryset = Category.objects.all()
-    template_name = 'recipes/categories.html'
 
 
 class PostDetailView(DetailView):

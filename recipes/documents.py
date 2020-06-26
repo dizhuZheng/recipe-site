@@ -1,6 +1,6 @@
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
-from .models import Category, Post, Ingredient, Step, Comment
+from .models import Post, Ingredient, Step, Comment
 from recipes.models import UserProfile
 from elasticsearch_dsl import analyzer
 

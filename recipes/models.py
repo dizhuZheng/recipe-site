@@ -21,26 +21,6 @@ class BaseModel(models.Model):
         abstract = True
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=200)
-    slug = models.SlugField()
-    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE, related_name='children')
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['name', 'parent'], name='unique_name')
-        ]
-        verbose_name_plural = "categories"
-
-    def __str__(self):
-        full_path = [self.name]
-        k = self.parent
-        while k is not None:
-            full_path.append(k.name)
-            k = k.parent
-        return ' -> '.join(full_path[::-1])
-
-
 class LikeCount(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
@@ -54,36 +34,14 @@ class Post(BaseModel):
     slug = models.SlugField(unique=True, max_length=100)
     favorites = models.ManyToManyField(UserProfile, related_name='post_favo')
     likes = GenericRelation(LikeCount, related_query_name='posts')  # no changes detected in db
-    CAT_CHOICE = [
-        ('Flavors', (
-            (11, 'spicy'),
-            (12, 'sour'),
-            (13, 'sweet'),
-            (14, 'bitter'),
-            (15, 'plain')
-        )),
-        ('Basic', (
-            (21, 'breakfast'),
-            (22, 'lunch'),
-            (23, 'supper'),
-            (24, 'snack'),
-            (25, 'beverages'),
-            (26, 'dessert')
-        )),
-        ('Style', (
-            (31, 'foreign food'),
-            (32, 'home cooking'),
-            (33, 'local characteristics'),
-        )),
-        ('People', (
-            (41, 'Baby'),
-            (42, 'Teenager'),
-            (43, 'Old people'),
-            (44, 'All')
-        )),
-        ('unknown', 'Unknown'),
-        ]
-    categories = models.ManyToManyField('Category', choices=CAT_CHOICE, default='unknown')
+    categories = models.ManyToManyField(
+        'category.Category',
+        help_text='Categorize this item.'
+    )
+    tags = models.ManyToManyField(
+        'category.Tag',
+        help_text='Tag this item.'
+    )
     STATUS = [
         (0, 'Draft'),
         (1, 'Publish')
