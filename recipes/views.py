@@ -213,16 +213,3 @@ def test_ajax(request, slug):
         like.save()
         like_count = len(p.likes.all())
         return JsonResponse({'likes': like_count, 'message': 'Success!!!'})
-
-
-def categories(request):
-    query_Set = Category.objects.all()
-    page = request.GET.get('page', 1)
-    paginator = Paginator(query_Set, 20)
-    try:
-        cat = paginator.page(page)
-    except PageNotAnInteger:
-        cat = paginator.page(1)
-    except EmptyPage:
-        cat = paginator.page(paginator.num_pages)
-    return render(request, 'recipes/categories.html', {'categories': cat})
