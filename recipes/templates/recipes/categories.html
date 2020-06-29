@@ -3,7 +3,9 @@
 {% load static %}
 {% block content %}
 <div>
-  <div class="image"></div>
+  {% for category in categories %}
+    <h1>{{ category }}</h1>
+  {% endfor %}
 </div>
 <style>
   @-webkit-keyframes rotate{
