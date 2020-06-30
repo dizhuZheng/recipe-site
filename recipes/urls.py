@@ -1,13 +1,13 @@
-from django.urls import path, include
-from django.conf.urls import url
+from django.urls import path, include, re_path
 from django.views.generic import TemplateView
-from .views import PostDetailView, PostListView, CategoryListView, CommentCreateView, CommentDeleteView, CreateRecipeView, PostDeleteView, favorite, test_ajax, PostEditView
+from .views import PostDetailView, PostListView, show_category, CategoryListView, CategoryDetailView, CommentCreateView, CommentDeleteView, CreateRecipeView, PostDeleteView, favorite, test_ajax, PostEditView
 
 app_name = 'posts'
 
 urlpatterns = [
     # path('category/', TemplateView.as_view(template_name='recipes/categories.html'), name='categories'),
     path('category/', CategoryListView.as_view(), name='categories'),
+    re_path(r'^category/(?P<slug>[-\w]+)/$', CategoryDetailView.as_view(), name='category_detail'),
     path('posts/', PostListView.as_view(), name='posts_list'),
     path('create/', CreateRecipeView.as_view(), name='create'),
     path('posts/<slug:slug>/', PostDetailView.as_view(), name='post_detail'),

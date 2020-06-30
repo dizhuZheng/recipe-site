@@ -61,6 +61,23 @@ class CategoryListView(ListView):
     template_name = 'recipes/categories.html'
 
 
+def show_category(request, hierarchy=None):
+    category_slug = hierarchy.split('/')
+    category_queryset = list(Category.objects.all())
+    all_slugs = [ x.slug for x in category_queryset ]
+    parent = None
+    for slug in category_slug:
+        if slug in all_slugs:
+            parent = get_object_or_404(Category, slug=slug, parent=parent)
+        else:
+            instance = get_object_or_404(Post, slug=slug)
+            breadcrumbs_link = instance.get_cat_list()
+            category_name = [' '.join(i.split('/')[-1].split('-')) for i in breadcrumbs_link]
+            breadcrumbs = zip(breadcrumbs_link, category_name)
+            return render(request, "postDetail.html", {'instance':instance,'breadcrumbs':breadcrumbs})
+    return render(request, "recieps/categories.html", {'post_set':parent.post_set.all(), 'sub_categories':parent.children.all()})
+
+
 class PostDetailView(DetailView):
     model = Post
     template_name = 'recipes/post_detail.html'
@@ -77,6 +94,12 @@ class PostDetailView(DetailView):
         if self.object.favorites.filter(username=self.request.user).exists():
             context['save_status'] = True
         return context
+
+
+class CategoryDetailView(DetailView):
+    model = Category
+    template_name = 'recipes/category_detail.html'
+    context_object_name = 'category'
 
 
 @login_required

@@ -32,6 +32,10 @@ class Category(models.Model):
         ]
         verbose_name_plural = "categories"
 
+    def get_absolute_url(self):
+        """returns the url to access a particular recipe access"""
+        return reverse('posts:category_detail', kwargs={'slug': self.slug})
+
     def __str__(self):
         full_path = [self.name]
         k = self.parent
