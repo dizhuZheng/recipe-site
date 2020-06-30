@@ -21,6 +21,7 @@ class BaseModel(models.Model):
         abstract = True
 
 
+<<<<<<< HEAD
 class Category(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField()
@@ -45,6 +46,8 @@ class Category(models.Model):
         return ' -> '.join(full_path[::-1])
 
 
+=======
+>>>>>>> 8b287a3bdb3f2aaeb2932eb74bb7ed79941afaae
 class LikeCount(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
@@ -58,7 +61,18 @@ class Post(BaseModel):
     slug = models.SlugField(unique=True, max_length=100)
     favorites = models.ManyToManyField(UserProfile, related_name='post_favo')
     likes = GenericRelation(LikeCount, related_query_name='posts')  # no changes detected in db
+<<<<<<< HEAD
     categories = models.ManyToManyField(Category, related_name='post_cat')
+=======
+    categories = models.ManyToManyField(
+        'category.Category',
+        help_text='Categorize this item.'
+    )
+    tags = models.ManyToManyField(
+        'category.Tag',
+        help_text='Tag this item.'
+    )
+>>>>>>> 8b287a3bdb3f2aaeb2932eb74bb7ed79941afaae
     STATUS = [
         (0, 'Draft'),
         (1, 'Publish')

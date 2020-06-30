@@ -1,6 +1,8 @@
 {% extends 'recipes/base.html' %}
 {% load imagekit %}
 {% load static %}
+{% block s %}Good Morning{% endblock s %}
+{% block title %}Breakfast{% endblock title %}
 {% block content %}
 {% if messages %}
   <div class="container">
@@ -58,7 +60,7 @@
         {% if page_obj.has_previous %}
           <a href="?page={{ page_obj.previous_page_number }}" class="w3-bar-item w3-button w3-hover-black">&laquo;</a>
         {% else %}
-          <a class="w3-bar-item w3-button w3-hover-black">&laquo;</a>
+          <img src="/media/images/noimage.jpg" alt="{{ post.title }}" style="width:100%;height:30%">
         {% endif %}
         {% for i in paginator.page_range %}
           {% if page_obj.number == i %}
@@ -70,8 +72,11 @@
         {% if page_obj.has_next %}
           <a href="?page={{ page_obj.next_page_number }}" class="w3-bar-item w3-button w3-hover-black">&raquo;</a>
         {% else %}
-          <a href="#" class="w3-bar-item w3-button">&raquo;</a>
+          <img src="/media/images/noimage.jpg" alt="{{ post.title }}" style="width:100%;;height:30%">
         {% endif %}
+        <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+        <p><strong>Author:</strong><a href="{% url 'users:profile' username=post.author.username %}">{{ post.author }}</a></p>
+        <p>Likes: {{ post.likes.count }}</p>
       </div>
     </div>
   {% endif %}
