@@ -71,10 +71,10 @@ def show_category(request, hierarchy= None):
             parent = get_object_or_404(Category, slug=slug, parent=parent)
         else:
             instance = get_object_or_404(Post, slug=slug)
-            breadcrumbs_link = instance.get_absolute_url()
+            breadcrumbs_link = instance.get_cat_list()
             category_name = [' '.join(i.split('/')[-1].split('-')) for i in breadcrumbs_link]
             breadcrumbs = zip(breadcrumbs_link, category_name)
-            return render(request, "post_detail.html", {'instance':instance, 'breadcrumbs':breadcrumbs})
+            return redirect('posts:post_detail', slug=instance.slug)
     return render(request, "recipes/sub_categories.html", {'post_set':parent.post_cat.all(), 'sub_categories':parent.children.all()})
 
 

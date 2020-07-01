@@ -58,7 +58,7 @@ class Post(BaseModel):
     slug = models.SlugField(unique=True, max_length=100)
     favorites = models.ManyToManyField(UserProfile, related_name='post_favo')
     likes = GenericRelation(LikeCount, related_query_name='posts')  # no changes detected in db
-    categories = models.ManyToManyField(Category, related_name='post_cat')
+    category = models.ForeignKey('Category', null=True, blank=True, on_delete=models.SET_NULL, related_name='post_cat')
     STATUS = [
         (0, 'Draft'),
         (1, 'Publish')
@@ -78,6 +78,16 @@ class Post(BaseModel):
 
     def __str__(self):
         return self.title
+
+    def get_cat_list(self):
+        k = self.category # for now ignore this instance method
+        breadcrumb = ["dummy"]
+        while k is not None:
+            breadcrumb.append(k.slug)
+            k = k.parent
+        for i in range(len(breadcrumb)-1):
+            breadcrumb[i] = '/'.join(breadcrumb[-1:i-1:-1])
+        return breadcrumb[-1:0:-1]
 
     def get_absolute_url(self):
         """returns the url to access a particular recipe access"""
