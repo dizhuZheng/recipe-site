@@ -2,10 +2,12 @@
 {% load imagekit %}
 {% load static %}
 {% block content %}
-<div class="container" style="margin-top: 6%; margin-bottom: 5%;">
+<div class="container" style="margin-top: 10%; margin-bottom: 10%;">
   <div class="newspaper">
     {% for category in category_list %}
-    <h3><a class="ex2" href="{{ post.get_absolute_url }}">{{ category }}</a></h3>
+      {% if not category.parent %}
+        <h3><a class="ex2" href="{% url 'posts:category_detail' category.slug %}">{{ category.name }}</a></h3>
+      {% endif %}
     {% endfor %}
   <div>
 </div>
@@ -19,33 +21,6 @@
     -webkit-column-gap:50px; /* Safari and Chrome */
     column-gap:50px;
   }
- a.ex2:hover, a.ex2:active {color: orange;}
-  @-webkit-keyframes rotate{
-    from{-webkit-transform:rotate(0deg)}
-    to{-webkit-transform:rotate(360deg)}
-    }
-  @-moz-keyframes rotate{
-    from{-moz-transform:rotate(0deg)}
-    to{-moz-transform:rotate(360deg)}
-    }
-  @-ms-keyframes rotate{
-    from{-ms-transform:rotate(0deg)}
-    to{-ms-transform:rotate(360deg)}
-    }
-  @-o-keyframes rotate{
-    from{-o-transform:rotate(0deg)}
-    to{-o-transform:rotate(360deg)}
-    }
-  .image{
-    background-image: url('/media/images/f.png');
-    background-repeat: no-repeat;
-    animation: 9.5s linear 0s normal none infinite rotate;
-    -webkit-animation:9.5s linear 0s normal none infinite rotate;
-    height: 282px;
-    width: 282px;
-    border-radius: 150px;
-    position: absolute;
-    z-index: 0;
-  }
+  a.ex2:hover, a.ex2:active {color: orange;}
   </style>
 {% endblock %}

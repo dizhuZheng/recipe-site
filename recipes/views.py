@@ -40,8 +40,8 @@ class IngredientForm(ModelForm):
         model = Ingredient
         exclude = ['post']
         widgets = {
-            'name': TextInput(attrs={'class': 'form-control','placeholder': 'Colby Chess','required': True}),
-            'amount': TextInput(attrs={'class': 'form-control','placeholder': 'eg:2g','required': True}),
+            'name': TextInput(attrs={'class': 'form-control', 'placeholder': 'Colby Chess','required': True}),
+            'amount': TextInput(attrs={'class': 'form-control', 'placeholder': 'eg:2g', 'required': True}),
             }
 
 
@@ -59,6 +59,29 @@ class CategoryListView(ListView):
     context_object_name = 'category_list'
     queryset = Category.objects.all()
     template_name = 'recipes/categories.html'
+
+
+def show_category(request, hierarchy= None):
+    category_slug = hierarchy.split('/')
+    category_queryset = list(Category.objects.all())
+    all_slugs = [ x.slug for x in category_queryset ]
+    parent = None
+    for slug in category_slug:
+        if slug in all_slugs:
+            parent = get_object_or_404(Category, slug=slug, parent=parent)
+        else:
+            instance = get_object_or_404(Post, slug=slug)
+            breadcrumbs_link = instance.get_absolute_url()
+            category_name = [' '.join(i.split('/')[-1].split('-')) for i in breadcrumbs_link]
+            breadcrumbs = zip(breadcrumbs_link, category_name)
+            return render(request, "post_detail.html", {'instance':instance, 'breadcrumbs':breadcrumbs})
+    return render(request, "recipes/sub_categories.html", {'post_set':parent.post_cat.all(), 'sub_categories':parent.children.all()})
+
+
+class CategoryDetailView(DetailView):
+    model = Category
+    template_name = 'recipes/category.html'
+    context_object_name = 'category'
 
 
 class PostDetailView(DetailView):

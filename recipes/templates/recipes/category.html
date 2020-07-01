@@ -1,0 +1,10 @@
+{% extends 'recipes/base.html' %}
+{% load imagekit %}
+{% load static %}
+{% block content %}
+<div class="container" style="margin-top: 10%; margin-bottom: 10%;">
+  {% for c in category.children.all %}
+  <li><a href="{% url 'posts:category_detail' c.slug %}">{{ c.name }}</a></li>
+  {% endfor %}
+</div>
+{% endblock %}
