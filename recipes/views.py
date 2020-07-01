@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from .models import Post, Comment, Ingredient, Step, LikeCount, Foo, Category
+from .models import Post, Comment, Ingredient, Step, LikeCount, Foo
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
@@ -61,7 +61,7 @@ class CategoryListView(ListView):
     template_name = 'recipes/categories.html'
 
 
-def show_category(request, hierarchy= None):
+def show_category(request, hierarchy=None):
     category_slug = hierarchy.split('/')
     category_queryset = list(Category.objects.all())
     all_slugs = [ x.slug for x in category_queryset ]
@@ -100,6 +100,12 @@ class PostDetailView(DetailView):
         if self.object.favorites.filter(username=self.request.user).exists():
             context['save_status'] = True
         return context
+
+
+class CategoryDetailView(DetailView):
+    model = Category
+    template_name = 'recipes/category_detail.html'
+    context_object_name = 'category'
 
 
 @login_required

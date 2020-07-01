@@ -1,6 +1,8 @@
 {% extends 'recipes/base.html' %}
 {% load imagekit %}
 {% load static %}
+{% block s %}Good Morning{% endblock s %}
+{% block title %}Breakfast{% endblock title %}
 {% block content %}
 {% if messages %}
   <div class="container">
@@ -14,20 +16,7 @@
     {% endfor %}
   </div>
 {% endif %}
-  <nav class="w3-sidebar w3-bar-block w3-card w3-top w3-xlarge w3-animate-left" style="display:none;z-index:2;width:40%;min-width:300px" id="mySidebar">
-    <a href="javascript:void(0)" onclick="w3_close()"
-    class="w3-bar-item w3-button">Close Menu</a>
-    <a href="{% url 'home' %}" onclick="w3_close()" class="w3-bar-item w3-button">Home</a>
-    <a href="#about" onclick="w3_close()" class="w3-bar-item w3-button">About</a>
-  </nav>
-  <div class="w3-top">
-    <div class="w3-white w3-xlarge" style="max-width:1200px;margin:auto">
-      <div class="w3-button w3-padding-16 w3-left" onclick="w3_open()">☰</div>
-      <div class="w3-right w3-padding-16">Good Morning</div>
-      <div class="w3-center w3-padding-16">My Food</div>
-    </div>
-  </div>
-  {% if post_list %}
+{% if post_list %}
   <div class="w3-main w3-content w3-padding" style="max-width:1200px;margin-top:100px">
     <div class="w3-row-padding w3-padding-16 w3-center" id="food">
       {% for post in post_list|slice:":4" %}
@@ -71,62 +60,25 @@
         {% if page_obj.has_previous %}
           <a href="?page={{ page_obj.previous_page_number }}" class="w3-bar-item w3-button w3-hover-black">&laquo;</a>
         {% else %}
-          <a class="w3-bar-item w3-button w3-hover-black">&laquo;</a>
+          <img src="/media/images/noimage.jpg" alt="{{ post.title }}" style="width:100%;height:30%">
         {% endif %}
         {% for i in paginator.page_range %}
           {% if page_obj.number == i %}
             <a href="#" class="w3-bar-item w3-black w3-button">{{ i }}</a>
           {% else %}
-            <a href="?page={{ i }}" class="w3-bar-item w3-button w3-hover-black">{{ i }}</a>
+            <a href="?page={{ i }}" class="w3-bar-item w3-button w3-hover-purple">{{ i }}</a>
           {% endif %}
         {% endfor %}
         {% if page_obj.has_next %}
           <a href="?page={{ page_obj.next_page_number }}" class="w3-bar-item w3-button w3-hover-black">&raquo;</a>
         {% else %}
-          <a href="#" class="w3-bar-item w3-button">&raquo;</a>
+          <img src="/media/images/noimage.jpg" alt="{{ post.title }}" style="width:100%;;height:30%">
         {% endif %}
+        <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+        <p><strong>Author:</strong><a href="{% url 'users:profile' username=post.author.username %}">{{ post.author }}</a></p>
+        <p>Likes: {{ post.likes.count }}</p>
       </div>
     </div>
   {% endif %}
-  <footer class="w3-row-padding w3-padding-32">
-    <div class="w3-third">
-      <h3>BooBoo Recipe</h3>
-      <p>Me gusta mucho la limonada.</p>
-      <p>Las uvas son deliciosas.</p>
-      <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">dizhu</a></p>
-    </div>
-    <div class="w3-third">
-      <h3>BLOG POSTS</h3>
-      <ul class="w3-ul w3-hoverable">
-        <li class="w3-padding-16">
-          <span class="w3-large">Lorem</span><br>
-          <span>Sed mattis nunc</span>
-        </li>
-        <li class="w3-padding-16">
-          <span class="w3-large">Ipsum</span><br>
-          <span>Praes tinci sed</span>
-        </li>
-      </ul>
-    </div>
-    <div class="w3-third w3-serif">
-      <h3>POPULAR TAGS</h3>
-      <p>
-        <span class="w3-tag w3-black w3-margin-bottom">Travel</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">New York</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Dinner</span>
-        <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Salmon</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">France</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Drinks</span>
-        <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Ideas</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Flavors</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Cuisine</span>
-        <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Chicken</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Dressing</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Fried</span>
-        <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Fish</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Duck</span>
-      </p>
-    </div>
-  </footer>
 </div>
-<script>
-// Script to open and close sidebar
-function w3_open() {
-  document.getElementById("mySidebar").style.display = "block";
-}
-function w3_close() {
-  document.getElementById("mySidebar").style.display = "none";
-}
-</script>
 {% endblock content %}

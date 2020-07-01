@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'category',
     'users',
     'recipes',
     'allauth.socialaccount.providers.github',
