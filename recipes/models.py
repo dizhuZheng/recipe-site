@@ -12,6 +12,7 @@ from star_ratings.models import Rating
 from imagekit.models import ProcessedImageField
 from imagekit.processors import ResizeToFill
 
+DEFAULT_CAT_ID = 52
 
 class BaseModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, verbose_name='Created Time')
@@ -22,7 +23,7 @@ class BaseModel(models.Model):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, default=DEFAULT_CAT_ID)
     slug = models.SlugField()
     parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE, related_name='children')
 
@@ -58,7 +59,7 @@ class Post(BaseModel):
     slug = models.SlugField(unique=True, max_length=100)
     favorites = models.ManyToManyField(UserProfile, related_name='post_favo')
     likes = GenericRelation(LikeCount, related_query_name='posts')  # no changes detected in db
-    category = models.ForeignKey('Category', null=True, blank=True, on_delete=models.SET_NULL, related_name='post_cat')
+    category = models.ForeignKey('Category', null=True, blank=True, on_delete=models.SET_NULL, related_name='post_cat', default=DEFAULT_CAT_ID)
     STATUS = [
         (0, 'Draft'),
         (1, 'Publish')
