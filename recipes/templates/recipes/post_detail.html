@@ -1,9 +1,8 @@
 {% extends 'recipes/base.html' %}
 {% load static %}
 {% load ratings %}
-{% block content %}
 {% if messages %}
-  <div class="container">
+  {% block m %}
       {% for message in messages %}
       <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-secondary{% endif %} alert-dismissible rounded-0 fade show" role="alert">
           {{ message }}
@@ -12,79 +11,83 @@
           </button>
       </div>
       {% endfor %}
-  </div>
+  {% endblock m %}
 {% endif %}
-<div class="container">
-  <h1>{{ post.title }}</h1>
-  <h3>Created by:  <img src="{{ post.author.photo.url }}" class="image-preview" width="25" height="25">
-    <a href="{% url 'users:profile' username=post.author.username %}" style="color: goldenrod;">{{ post.author }}</a>
-  </h3>
-  <p style="text-align:center; " class="sansserif"> Updated at: {{ post.updated_on|date:"D d M Y" }}</p>
-  <div class="profile-container">
-    {% if steps.last.pic %}
-      <img src="{{ steps.last.pic.url }}" width="250" height="250">
-    {% else %}
-      <img src="/media/images/noimage.jpg" width="200" height="200">
-    {% endif %}
-    <div>
-      <p class="sansserif">Categories: {{ post.categories }}</p>
-      <p class="sansserif">Cook Time: {{ post.cook_time }}{{ post.unit }}</p>
-      <button class="btn" id="like" value="Good Recipe"><i class="fas fa-thumbs-up"></i><span id="test1">({{ likes }})</span></button>
-      <br><br>
-      <h3>Difficulty level:</h3>
-      <div class="sansserif">{% ratings object %}</div>
+{% block content %}
+<div class="container" style="margin-top: 6%; margin-bottom: 10%; margin-left: 5%;">
+  <div class="row">
+    <div class="col-sm-3" style="background-color:lavender; padding: 20px;">
+      <h1>{{ post.title }}</h1>
+      <h3>Author:  <img src="{{ post.author.photo.url }}" class="image-preview" width="25" height="25">
+        <a href="{% url 'users:profile' username=post.author.username %}" style="color: goldenrod;">{{ post.author }}</a>
+      </h3>
+      <p> Updated at: {{ post.updated_on|date:"D d M Y" }}</p>
+      {% if steps.last.pic %}
+        <img src="{{ steps.last.pic.url }}" width="250" height="250">
+      {% else %}
+        <img src="/media/images/noimage.jpg" width="200" height="200">
+      {% endif %}
+    </div>
+    <div class="col-sm-3" style="background-color:lavenderblush;padding: 50px;">
+      <div style="font-family: fantasy;">
+        <p>Categories: {{ post.category.name }}</p>
+        <p>Cook Time: {{ post.cook_time }}{{ post.unit }}</p>
+        <p>Likes: <button class="btn" id="like" value="Good Recipe"><i class="fas fa-thumbs-up"></i><span id="test1">{{ likes }}</span></button></p>
+        <p>Difficulty level:</p>
+        <p>{% ratings object %}</p>
+        <div>
+          {% ifnotequal request.user post.author %}
+            {% if not save_status %}
+            <form method="POST" action="{% url 'recipes:post_favorite' slug=post.slug %}">
+              <input type="hidden" name="supporttype" />
+              <input type="submit" value="Save to favorites" name='like'/>
+            </form>
+            {% endif %}
+          {% endifnotequal %}
+        </div>
+      </div>
     </div>
   </div>
-<div>
-  <h4>{{ ingredients.count }} ingredients</h4>
-  {% for i in ingredients %}
-  <label class="container">
-    {{ i.name }}--{{ i.amount}}
-    {% if i.unit %}
-      {{ i.unit }}
-    {% endif %}
-    <input type="checkbox">
-    <span class="checkmark"></span>
-  </label>
-  {% endfor %}
-</div>
-<br>
-<h4>Steps:</h4>
-{% for step in steps %}
-  <div class="steps">
-    {% if step.pic %}
-      <img src="{{ step.pic.url }}" class="img-responsive" style="width: 20%; float: left;" />
-    {% else %}
-      <img src="/media/images/noimage.jpg" class="img-responsive" style="width: 20%; float: left;" />
-    {% endif %}
-    <div id="test">{{ step.text }}</div>
+  <div>
+    <h2>{{ ingredients.count }} ingredients</h2>
+    {% for i in ingredients %}
+    <label class="c">
+      {{ i.name }}--{{ i.amount}}
+      {% if i.unit %}
+        {{ i.unit }}
+      {% endif %}
+      <input type="checkbox">
+      <span class="checkmark"></span>
+    </label>
+    {% endfor %}
   </div>
-{% endfor %}
+  <h2>Steps:</h2>
+  {% for step in steps %}
+    <div class="steps">
+      {% if step.pic %}
+        <img src="{{ step.pic.url }}" class="img-responsive" style="width: 20%; float: left;" />
+      {% else %}
+        <img src="/media/images/noimage.jpg" class="img-responsive" style="width: 20%; float: left;" />
+      {% endif %}
+      <ol><li>{{ step.text }}</li></ol>
+    </div>
+  {% endfor %}
 <div>
-  {% ifnotequal request.user post.author %}
-    {% if not save_status %}
-    <form method="POST" action="{% url 'recipes:post_favorite' slug=post.slug %}">
-      <input type="hidden" name="supporttype" />
-      <input type="submit" value="Save to favorites" name='like'/>
-    </form>
-    {% endif %}
-  {% endifnotequal %}
-</div>
-<div>
+  <h2>Comments:</h2>
   {% for comment in comments.all %}
     <div>{{ comment.created_on }}</div>
     <img src="{{ comment.author.photo.url }}" class="image-preview" width="25" height="25">
     <strong>{{ comment.author }}</strong>
-    <p>{{ comment.text|linebreaks }}</p>
+    <p class="solid">{{ comment.text|linebreaks }}</p>
     {% ifequal request.user comment.author %}
-      <a href="{% url 'recipes:delete_comment' slug=post.slug pk=comment.id %}">Delete comment</a>
+      <button><a href="{% url 'recipes:delete_comment' slug=post.slug pk=comment.id %}">Delete comment</a></button>
     {% endifequal %}
   {% empty %}
       <p>No comments here yet :-(</p>
   {% endfor %}
-  <a href="{% url 'recipes:add_comment' slug=post.slug %}">Add comment</a>
+  <button><a href="{% url 'recipes:add_comment' slug=post.slug %}">Add comment</a></button>
 </div>
-{% endblock %}
+</div>
 <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
 <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
 <script src='https://kit.fontawesome.com/a076d05399.js'></script>
@@ -112,28 +115,6 @@ $(document).ready(function(){
 </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
-  /* The container */
-  .container {
-    display: block;
-    position: relative;
-    padding-left: 35px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    font-size: 15px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-  /* Hide the browser's default checkbox */
-  .container input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-  }
-
   /* Create a custom checkbox */
   .checkmark {
     position: absolute;
@@ -145,29 +126,26 @@ $(document).ready(function(){
   }
 
   /* On mouse-over, add a grey background color */
-  .container:hover input ~ .checkmark {
+  .c:hover input ~ .checkmark {
     background-color: #ccc;
   }
 
   /* When the checkbox is checked, add a blue background */
-  .container input:checked ~ .checkmark {
+  .c input:checked ~ .checkmark {
     background-color: #2196F3;
   }
-
   /* Create the checkmark/indicator (hidden when not checked) */
   .checkmark:after {
     content: "";
     position: absolute;
     display: none;
   }
-
   /* Show the checkmark when checked */
-  .container input:checked ~ .checkmark:after {
+  .c input:checked ~ .checkmark:after {
     display: block;
   }
-
   /* Style the checkmark/indicator */
-  .container .checkmark:after {
+  .c .checkmark:after {
     left: 9px;
     top: 5px;
     width: 5px;
@@ -178,35 +156,20 @@ $(document).ready(function(){
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
   }
-  .steps {
+  .container .steps {
     margin-left: 10px;
-    padding-bottom: 30px;
-  }
-  .steps img{
-    margin-left: 10px;
-    padding-top: 10px;
-    padding-right: 1000px;
-    float: left;
-  }
-  .text{
-    height: 200px;
-    width: 50%;
-    float:right;
+    padding-bottom: 300px;
   }
   .btn {
   background-color: rgb(86, 104, 163);
   border: none;
-  border-radius: 12px;
   color: white;
-  padding: 10px 13px;
-  font-size: 25px;
+  padding: 5px 7px;
+  font-size: 15px;
   cursor: pointer;
 }
-h1, h3, h3{
+h1, h3, p{
   text-align: center;
-}
-.sansserif {
-  font-family: Arial, Helvetica, sans-serif;
 }
 .profile-container > img{
   display: block;
@@ -217,11 +180,12 @@ h1, h3, h3{
 .profile-container > div {
   display: inline-block;
   position: absolute;
-  right: 200px;
-  margin-top: -250px;
-  padding: 5px;
+  right: 10%;
+  top: 15%;
+  float: right;
   line-height: 15px;
   font-size: 15px;
-  color:mediumspringgreen;
 }
+p.solid {border-style: solid;}
 </style>
+{% endblock content %}

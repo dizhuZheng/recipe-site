@@ -6,7 +6,7 @@
 <div class="container" style="margin-top: 10%; margin-bottom: 10%;">
 {% if sub_categories %}
     {% for i in sub_categories %}
-        <a href="{{ i.slug }}"> {{ i.name }} </a>
+        <li><a href="{{ i.slug }}"> {{ i.name }} </a></li>
     {% endfor %}
 {% endif %}
 <div class="row small-up-1 medium-up-3" >
