@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from .models import Post, Comment, Ingredient, Step, LikeCount, Foo, Category
+from .models import Post, Comment, Ingredient, Step, LikeCount, Foo, Category, Count, Q
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
@@ -75,7 +75,7 @@ def show_category(request, hierarchy= None):
             category_name = [' '.join(i.split('/')[-1].split('-')) for i in breadcrumbs_link]
             breadcrumbs = zip(breadcrumbs_link, category_name)
             return redirect('posts:post_detail', slug=instance.slug)
-    return render(request, "recipes/sub_categories.html", {'post_set':parent.post_cat.all(), 'sub_categories':parent.children.all()})
+    return render(request, "recipes/sub_categories.html", {'post_set':parent.post_cat.all(), 'parent':parent.name, 'sub_categories':parent.children.all()})
 
 
 class CategoryDetailView(DetailView):

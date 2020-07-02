@@ -1,5 +1,6 @@
 {% extends 'recipes/base.html' %}
 {% load static %}
+{% block title %}My Profile{% endblock %}
 {% block content %}
 {% if messages %}
   <div class="container">
@@ -13,8 +14,7 @@
     {% endfor %}
   </div>
 {% endif %}
-<h2 style="text-align: center; margin-top: 4%px;">My profile</h2>
-<div class="container" style="text-align: center; margin-top: 4%;">
+<div class="container" style="text-align: center; margin-top: 8%;">
   {% if p.photo %}
       <img src="{{ p.photo.url }}" class="image-preview" width="250" height="250">
   {% else %}
@@ -28,14 +28,11 @@
       <a href="{% url 'users:my_drafts' %}">My Drafts</a>
     {% endifequal %}
   {% endif %}
-  <h3>Navigation:</h3>
-  <div>
+  <p style="padding-top: 10px;">
     <a href="{% url 'users:my_saves' username=p.username %}">My Favorites</a>
-    &nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;
     <a href="{% url 'users:my_posts' username=p.username %}">My posts</a>
-    &nbsp;&nbsp;
-    <a href="{% url 'home' %}">Home Page</a>
-  </div>
+  </p>
   <h3>Basic Information:</h3>
   <div>
     <li>Gender: {{ p.gender }}</li>
@@ -49,6 +46,12 @@
   h3{
     color:blueviolet;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  }
+  a{
+    font-family: fantasy;
+    font-size: larger;
+    color: aquamarine;
+    text-decoration: underline;
   }
 </style>
 {% endblock content %}
