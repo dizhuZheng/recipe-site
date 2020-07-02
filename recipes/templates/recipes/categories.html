@@ -11,7 +11,8 @@
         <h3><a class="ex2" href="{% url 'posts:category' category.slug %}">{{ category.name }}</a></h3>
       {% endif %}
     {% endfor %}
-  <div>
+  {% endif %}
+{% endwith %}
 </div>
 <style>
   .newspaper
