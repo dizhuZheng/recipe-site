@@ -33,10 +33,6 @@ class Category(models.Model):
         ]
         verbose_name_plural = "categories"
 
-    def get_same_level_category(self):
-        if self.parent:
-            return self.parent.children.all().exclude(id=self.id)
-
     def __str__(self):
         full_path = [self.name]
         k = self.parent
