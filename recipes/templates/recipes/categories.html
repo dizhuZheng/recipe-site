@@ -12,6 +12,26 @@
       {% endif %}
     {% endfor %}
   </div>
+  <div class="responsive">
+    <div class="gallery">
+        <img src="/media/images/dan.jpeg" alt="Cinque Terre">
+    </div>
+  </div>
+  <div class="responsive">
+    <div class="gallery">
+        <img src="/media/images/dan.jpeg" alt="Forest">
+    </div>
+  </div>
+  <div class="responsive">
+    <div class="gallery">
+        <img src="/media/images/dan.jpeg" alt="Northern Lights">
+    </div>
+  </div>
+  <div class="responsive">
+    <div class="gallery">
+        <img src="/media/images/dan.jpeg" alt="Northern Lights">
+    </div>
+  </div>
 </div>
 <footer class="container-fluid w3-black w3-center w3-large" style="position: fixed; bottom: 0; padding-top: 15px; padding-bottom: 20px;">
   <p>Follow me on social media.</p>
@@ -38,5 +58,34 @@
     position: fixed;
     bottom: 0;
   }
+  div.gallery img {
+    width: 70%;
+    height: auto;
+    -ms-transform: rotate(40deg); /* IE 9 */
+    transform: rotate(40deg); /* Standard syntax */
+  }
+  .responsive {
+  padding: 25px 50px;
+  float: left;
+  width: 24.99999%;
+}
+
+@media only screen and (max-width: 700px) {
+  .responsive {
+    width: 49.99999%;
+    margin: 6px 0;
+  }
+}
+@media only screen and (max-width: 500px) {
+  .responsive {
+    width: 100%;
+  }
+}
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
 </style>
 {% endblock content %}

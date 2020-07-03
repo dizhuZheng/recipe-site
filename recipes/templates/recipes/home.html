@@ -2,13 +2,12 @@
 {% load static %}
 {% load bootstrap4 %}
 {% if request.user.is_authenticated %}
-{% block content %}<h4 style="color:crimson">Welcome, {{ request.user.username }}</h4>{% endblock content %}
-{% block add %}
-  <p>Click here to create:</p>
-  <div><a href="{% url 'posts:create' %}">
-  <img src="/media/images/add--v2.png" alt="Click icon" style="width:50%;height:50%;"></a>
-  </div>
-{% endblock %}
+  {% block content %}<h4 style="color:crimson">Welcome, {{ request.user.username }}</h4>{% endblock content %}
+  {% block add %}
+    <p>Click here to create:</p>
+    <a href="{% url 'posts:create' %}">
+    <img src="/media/images/add--v2.png" alt="Click icon" style="width:50%;height:50%;margin-left: 28%;"></a>
+  {% endblock %}
 {% endif %}
 {% block pics %}
 <div id="slidershow" class="carousel slide" data-ride="carousel" data-interval = 3000 data-pause = "hover" data-wrap="true"
@@ -43,7 +42,7 @@
 {% endblock %}
 {% block footer %}
 <footer class="w3-row-padding w3-padding-32">
-  <div class="w3-third w3-large">
+  <div class="w3-third w3-small">
     <h4>BooBoo Recipe</h4>
     <p>Me gusta mucho la limonada.</p>
     <p>Las uvas son deliciosas.</p>
@@ -60,7 +59,7 @@
       <i class="fa fa-linkedin w3-hover-opacity"></i>
     </div>
   </div>
-  <div class="w3-third w3-serif w3-large">
+  <div class="w3-third w3-serif w3-small">
     <h4>Popular Tags</h4>
     <p>
       <span class="w3-tag w3-black w3-margin-bottom">Travel</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">New York</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Dinner</span>
