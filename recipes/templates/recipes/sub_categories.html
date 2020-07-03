@@ -11,25 +11,66 @@
 {% endif %}
 <div class="row small-up-1 medium-up-3" >
 {% if post_set %}
-{% for i in post_set %}
-    <div class="columns">
-        <div class=" card-article-hover card">
-          <a href="{{ i.slug }}">
-            <img  src="{{ i.cover_photo.url }}">
-          </a>
-          <div class="card-section">
+  {% for i in post_set %}
+      <div class="columns">
+          <div class=" card-article-hover card">
             <a href="{{ i.slug }}">
-              <h6 class="article-title">{{ i.title | truncatechars:30}}</h6>
+              <img  src="{{ i.cover_photo.url }}">
             </a>
+            <div class="card-section">
+              <a href="{{ i.slug }}">
+                <h6 class="article-title">{{ i.title | truncatechars:30}}</h6>
+              </a>
+            </div>
+            <div class="card-divider flex-container align-middle">
+              <a href="{% url 'users:profile' username=i.author.username %}" style="color: goldenrod;">{{ i.author }}</a>
+            </div>
+            <div class="hover-border">
+            </div>
           </div>
-          <div class="card-divider flex-container align-middle">
-            <a href="{% url 'users:profile' username=i.author.username %}" style="color: goldenrod;">{{ i.author }}</a>
-          </div>
-          <div class="hover-border">
-          </div>
-        </div>
-    </div>
-{% endfor %}
+      </div>
+  {% endfor %}
 {% endif %}
+<div class="image"></div>
 </div>
+</div>
+<footer class="container-fluid w3-black w3-center w3-large" style="position: fixed; bottom: 0; padding-top: 15px; padding-bottom: 20px;">
+  <p>Follow me on social media.</p>
+  <i class="fa fa-facebook-official w3-hover-opacity"></i>
+  <i class="fa fa-instagram w3-hover-opacity"></i>
+  <i class="fa fa-snapchat w3-hover-opacity"></i>
+  <i class="fa fa-pinterest-p w3-hover-opacity"></i>
+  <i class="fa fa-twitter w3-hover-opacity"></i>
+  <i class="fa fa-linkedin w3-hover-opacity"></i>
+  <p>Powered by dizhu</p>
+</footer>
+<style>
+  @-webkit-keyframes rotate{
+    from{-webkit-transform:rotate(0deg)}
+    to{-webkit-transform:rotate(360deg)}
+    }
+  @-moz-keyframes rotate{
+    from{-moz-transform:rotate(0deg)}
+    to{-moz-transform:rotate(360deg)}
+    }
+  @-ms-keyframes rotate{
+    from{-ms-transform:rotate(0deg)}
+    to{-ms-transform:rotate(360deg)}
+    }
+  @-o-keyframes rotate{
+   from{-o-transform:rotate(0deg)}
+    to{-o-transform:rotate(360deg)}
+    }
+  .image{
+    background-image: url('/media/images/f.png');
+    background-repeat: no-repeat;
+    animation: 9.5s linear 0s normal none infinite rotate;
+    -webkit-animation:9.5s linear 0s normal none infinite rotate;
+    height: 280px;
+    width: 280px;
+    border-radius: 150px;
+    position: relative;
+    z-index: 0;
+  }
+</style>
 {% endblock %}

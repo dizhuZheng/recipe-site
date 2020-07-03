@@ -11,8 +11,18 @@
         <h3><a class="ex2" href="{% url 'posts:category' category.slug %}">{{ category.name }}</a></h3>
       {% endif %}
     {% endfor %}
-  <div>
+  </div>
 </div>
+<footer class="container-fluid w3-black w3-center w3-large" style="position: fixed; bottom: 0; padding-top: 15px; padding-bottom: 20px;">
+  <p>Follow me on social media.</p>
+  <i class="fa fa-facebook-official w3-hover-opacity"></i>
+  <i class="fa fa-instagram w3-hover-opacity"></i>
+  <i class="fa fa-snapchat w3-hover-opacity"></i>
+  <i class="fa fa-pinterest-p w3-hover-opacity"></i>
+  <i class="fa fa-twitter w3-hover-opacity"></i>
+  <i class="fa fa-linkedin w3-hover-opacity"></i>
+  <p>Powered by dizhu</p>
+</footer>
 <style>
   .newspaper
   {
@@ -24,5 +34,9 @@
     column-gap:50px;
   }
   a.ex2:hover, a.ex2:active {color: orange;}
+  footer{
+    position: fixed;
+    bottom: 0;
+  }
 </style>
 {% endblock content %}

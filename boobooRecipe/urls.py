@@ -27,6 +27,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('accounts/', include('users.urls')),
     path('', TemplateView.as_view(template_name='recipes/home.html'), name='home'),
+    path('contact/', TemplateView.as_view(template_name='contact.html'), name='contact'),
     path('recipes/', include((recipes_url, 'recipes'), namespace='recipes')),
     url(r'^ratings/', include(('star_ratings.urls', 'ratings'), namespace='ratings')),
 ]
