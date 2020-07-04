@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf.urls import url
 from django.views.generic import TemplateView
 from .views import PostDetailView, PostListView, CategoryListView, show_category, CategoryDetailView, CommentCreateView, CommentDeleteView, CreateRecipeView, PostDeleteView, favorite, test_ajax, PostEditView
