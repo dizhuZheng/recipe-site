@@ -13,22 +13,21 @@ import json
 
 def profile(request, username):
     '''show my profile'''
-    user = request.user
     p = UserProfile.objects.get(username=username)
-    return render(request, 'users/profile.html', {'user':user, 'p': p})
+    return render(request, 'users/profile.html', {'user':request.user, 'p': p})
 
 
 def my_posts(request, username):
-    author = UserProfile.objects.get(username=username)
-    my_posts = Post.objects.filter(author=author, status=1)
+    all_posts = UserProfile.objects.prefetch_related('post_author').get(username=username)
+    my_posts = all_posts.post_author.filter(status=1)
     return render(request, 'users/my_posts.html', {'my_posts': my_posts})
 
 
 @login_required
 def my_drafts(request):
-    user = request.user
-    my_drafts = Post.objects.filter(author=user, status=0)
-    return render(request, 'users/my_drafts.html', {'user':user, 'my_drafts': my_drafts})
+    all_drafts = UserProfile.objects.prefetch_related('post_author').get(username=request.user.username)
+    my_drafts = all_drafts.post_author.filter(status=0)
+    return render(request, 'users/my_drafts.html', {'user':request.user, 'my_drafts': my_drafts})
 
 
 @csrf_protect

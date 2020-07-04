@@ -92,12 +92,12 @@ class PostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(PostDetailView, self).get_context_data(**kwargs)
-        context['ingredients'] = self.object.post_ingredients.all()
-        context['steps'] = self.object.post_steps.all()
-        context['comments'] = self.object.post_comments.all()
+        context['ingredients'] = self.object.prefetch_related('post_ingredients').all()
+        context['steps'] = self.object.prefetch_related('post_steps').all()
+        context['comments'] = self.object.prefetch_related('post_comments').all()
         context['save_status'] = False
         context['likes'] = len(self.object.likes.all())
-        if self.object.favorites.filter(username=self.request.user).exists():
+        if self.object.prefetch_related('favorites').filter(username=self.request.user).exists():
             context['save_status'] = True
         return context
 
