@@ -34,4 +34,4 @@ social-auth-core==3.2.0
 soupsieve==2.0
 sqlparse==0.3.0
 swapper==1.1.2.post1
-urllib3==1.25.7
+urllib3==1.25.8
